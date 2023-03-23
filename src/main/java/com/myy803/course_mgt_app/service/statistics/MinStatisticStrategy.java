@@ -15,8 +15,4 @@ public class MinStatisticStrategy extends TemplateStatisticStrategy{
 		return ds.getMin();
 	}
 
-	@Override
-	public String getStrategyName() {
-		return super.getStatisticName();
-	}
 }

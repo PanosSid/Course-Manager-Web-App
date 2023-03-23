@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -19,6 +18,7 @@ import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.statistics.StatisticStrategy;
+import com.myy803.course_mgt_app.service.statistics.TemplateStatisticStrategy;
 
 @Service
 public class CourseServiceImp implements CourseService {
@@ -64,15 +64,13 @@ public class CourseServiceImp implements CourseService {
 	}
 
 	@Override
-	public Map<String, ArrayList<Double>> getCourseStatistics(List<StudentRegistration> studReg_list) {
-		Map<String, ArrayList<Double>> mapCalcs = new HashMap<String, ArrayList<Double>>();
-
+	public Map<String, List<Double>> getCourseStatistics(List<StudentRegistration> studRegs) {
+		Map<String, List<Double>> mapCalcs = new HashMap<String, List<Double>>();
 		for (StatisticStrategy statStrat : statCalculationStrategies) {
-			String stratName = statStrat.getStrategyName();
-			ArrayList<Double> gradesStats = statStrat.calculateStatistcs(studReg_list);
+			String stratName = ((TemplateStatisticStrategy) statStrat).getStatisticName();
+			List<Double> gradesStats = statStrat.calculateStatistcs(studRegs);
 			mapCalcs.put(stratName, gradesStats);
 		}
-
 		return mapCalcs;
 	}
 

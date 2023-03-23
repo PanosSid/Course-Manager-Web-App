@@ -15,8 +15,4 @@ public class VarianceStatisticStrategy extends TemplateStatisticStrategy{
 		return ds.getVariance();
 	}
 
-	@Override
-	public String getStrategyName() {
-		return super.getStatisticName();
-	}
 }

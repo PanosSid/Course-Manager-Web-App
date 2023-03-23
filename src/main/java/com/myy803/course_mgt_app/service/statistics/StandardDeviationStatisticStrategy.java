@@ -14,10 +14,5 @@ public class StandardDeviationStatisticStrategy extends TemplateStatisticStrateg
 	public double doActualCalculation(DescriptiveStatistics ds) {
 		return ds.getStandardDeviation();
 	}
-
-	@Override
-	public String getStrategyName() {
-		return super.getStatisticName();
-	}
 	
 }

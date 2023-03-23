@@ -14,7 +14,7 @@ public interface StudentRegistrationService {
 
 	void delete(StudentRegistration studReg);
 
-	StudentRegistration findStudentRegistrationByStudentId(int i);
+	StudentRegistration findStudentRegistrationByStudentId(int id);
 
 	List<StudentRegistration> findStudentRegistrationsByCourseId(String courseId);
 

@@ -15,9 +15,4 @@ public class MeanStatisticStrategy extends TemplateStatisticStrategy{
 		return ds.getMean();
 	}
 
-	@Override
-	public String getStrategyName() {
-		return super.getStatisticName();
-	}
-
 }

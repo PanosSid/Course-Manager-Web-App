@@ -68,8 +68,7 @@ public class StudentRegistration {
 	@Transient
 	private Double finalGrade;
 
-	public StudentRegistration() {
-	};
+	public StudentRegistration() {};
 
 	public StudentRegistration(int dbKeyStudReg,
 			@NotNull(message = "Student's Registration Number cannot be null.") @Min(1) Integer studentId,

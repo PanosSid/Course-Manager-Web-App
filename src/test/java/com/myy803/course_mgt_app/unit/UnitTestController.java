@@ -184,7 +184,7 @@ public class UnitTestController {
 		Mockito.when(courseService.findCourseByCourseId("MCK-000")).thenReturn(course);
 		
 		List<StudentRegistration> studRegList = new ArrayList<StudentRegistration>();
-		Map<String, ArrayList<Double>> map = new HashMap<String, ArrayList<Double>>();
+		Map<String, List<Double>> map = new HashMap<String, List<Double>>();
 		Mockito.when(courseService.getCourseStatistics(studRegList)).thenReturn(map);
 		
 		mockMvc.perform(get("/courses/showStatisticsOfCourse?courseId=MCK-000")).

@@ -1,12 +1,9 @@
 package com.myy803.course_mgt_app.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +27,7 @@ public class CourseMgtAppController {
 	private CourseService courseService;
 
 	@Autowired
-	private StudentRegistrationService studentRegistrationService;
+	private StudentRegistrationService studentRegService;
 
 	@RequestMapping("/courses/list")
 	public String listCourses(Model theModel) {
@@ -79,61 +76,63 @@ public class CourseMgtAppController {
 	}
 
 	@RequestMapping("/courses/showStatisticsOfCourse")
-	public String showStatisticsOfCourse(@RequestParam("courseId") String courseId, Model theModel) {
+	public String showStatisticsOfCourse(@RequestParam("courseId") String courseId, Model model) {
+		setStatistcsPageTile(courseId, model);
+		Map<String, List<Double>> statsMap = courseService
+				.getCourseStatistics(studentRegService.findStudentRegistrationsByCourseId(courseId));
 
-		List<StudentRegistration> studReg_list = studentRegistrationService
-				.findStudentRegistrationsByCourseId(courseId);
-		// used for setting the title dynamically
-		Course theCourse = courseService.findCourseByCourseId(courseId);
-		String studRegTitle = theCourse.getCourseId() + " " + theCourse.getName();
-		theModel.addAttribute("studRegTitle", studRegTitle);
+		setStatsToModel(model, statsMap);
+		return "/courses/course-statistics";
+	}
 
-		theModel.addAttribute("courseId", courseId);
-
-		Map<String, ArrayList<Double>> statsMap = courseService.getCourseStatistics(studReg_list);
-		// ex {"Min" : [projectGrade, examGrade, finalGrad], "Max" : [projectGrade,
-		// examGrade, finalGrade] ...}
-
+	public void setStatsToModel(Model model, Map<String, List<Double>> statsMap) {
+		// ex. stasMap = {"Min" : [projectGrade, examGrade, finalGrade],
+		//		"Max" : [projectGrade,examGrade, finalGrade] ...}
 		Map<String, Double> projectMap = new HashMap<String, Double>();
 		Map<String, Double> examMap = new HashMap<String, Double>();
 		Map<String, Double> finalMap = new HashMap<String, Double>();
 
-		for (Map.Entry<String, ArrayList<Double>> set : statsMap.entrySet()) {
+		for (Map.Entry<String, List<Double>> set : statsMap.entrySet()) {
 			String statisticName = set.getKey();
 			projectMap.put(set.getKey(), set.getValue().get(0));
-			theModel.addAttribute("Project" + statisticName, projectMap.get(statisticName));
 			examMap.put(set.getKey(), set.getValue().get(1));
-			theModel.addAttribute("Exam" + statisticName, examMap.get(statisticName));
 			finalMap.put(set.getKey(), set.getValue().get(2));
-			theModel.addAttribute("Final" + statisticName, finalMap.get(statisticName));
-
+			model.addAttribute("Project" + statisticName, projectMap.get(statisticName));
+			model.addAttribute("Exam" + statisticName, examMap.get(statisticName));
+			model.addAttribute("Final" + statisticName, finalMap.get(statisticName));
 		}
-
+		
+		//TODO remove these
 		// these attributes are used only for acceptance testing to make our life easier
-		theModel.addAttribute("projectMap", projectMap);
-		theModel.addAttribute("examMap", examMap);
-		theModel.addAttribute("finalMap", finalMap);
+		model.addAttribute("projectMap", projectMap);
+		model.addAttribute("examMap", examMap);
+		model.addAttribute("finalMap", finalMap);
+	}
 
-		return "/courses/course-statistics";
+	public void setStatistcsPageTile(String courseId, Model model) {
+		Course theCourse = courseService.findCourseByCourseId(courseId);
+		model.addAttribute("studRegTitle", getStudentRegTitle(theCourse));
+		model.addAttribute("courseId", courseId);
+	}
+
+	public String getStudentRegTitle(Course theCourse) {
+		return theCourse.getCourseId() + " " + theCourse.getName();
 	}
 
 	@RequestMapping("/courses/showStudentRegListOfCourse")
 	public String showStudentRegListOfCourse(@RequestParam("courseId") String courseId, Model theModel) {
-		List<StudentRegistration> studReg_list = studentRegistrationService
-				.findStudentRegistrationsByCourseId(courseId);
-		theModel.addAttribute("studRegList", studReg_list);
-		// used for setting the title dynamically
 		Course theCourse = courseService.findCourseByCourseId(courseId);
-		String studRegTitle = theCourse.getCourseId() + " " + theCourse.getName();
-		theModel.addAttribute("studRegTitle", studRegTitle);
+		theModel.addAttribute("studRegTitle", getStudentRegTitle(theCourse));
 		theModel.addAttribute("courseId", courseId);
+		theModel.addAttribute("studRegList", studentRegService
+				.findStudentRegistrationsByCourseId(courseId));
 		return "/studentRegistration/list-studentRegistrations";
 	}
 
 	@RequestMapping("/studentRegistrations/deleteStudentReg")
 	public String deleteStudentRegistration(@RequestParam("studentRegId") int studRegId) {
-		String cId = studentRegistrationService.findStudentRegistrationByStudentId(studRegId).getCourseId();
-		studentRegistrationService.deleteByStudentId(studRegId);
+		String cId = studentRegService.findStudentRegistrationByStudentId(studRegId).getCourseId();
+		studentRegService.deleteByStudentId(studRegId);
 		String redirectToCourse = "redirect:/courses/showStudentRegListOfCourse?courseId=" + cId;
 		return redirectToCourse;
 
@@ -158,7 +157,7 @@ public class CourseMgtAppController {
 			return "/studentRegistration/studentReg-form";
 		}
 		// used for testing
-		StudentRegistration savedStudReg = studentRegistrationService.save(theStudentReg);
+		StudentRegistration savedStudReg = studentRegService.save(theStudentReg);
 		theModel.addAttribute("savedStudReg", savedStudReg);
 		String redirectToCourse = "redirect:/courses/showStudentRegListOfCourse?courseId="
 				+ theStudentReg.getCourseId();
@@ -168,7 +167,7 @@ public class CourseMgtAppController {
 
 	@RequestMapping("/studentRegistrations/showFormForUpdateStudentReg")
 	public String showFormForUpdateStudentReg(Model theModel, @RequestParam("studentRegId") int studRegId) {
-		StudentRegistration theStudentReg = studentRegistrationService.findStudentRegistrationByStudentId(studRegId);
+		StudentRegistration theStudentReg = studentRegService.findStudentRegistrationByStudentId(studRegId);
 		theModel.addAttribute("studentReg", theStudentReg);
 		// used for link back to Course MYY-xxx in the update page
 		String courseId = theStudentReg.getCourseId();
@@ -191,7 +190,7 @@ public class CourseMgtAppController {
 	public String uploadStudentRegFile(@RequestParam("file") MultipartFile file,
 			@RequestParam("courseId") String courseId) {
 		if ("text/csv".equals(file.getContentType())) {
-			studentRegistrationService.saveStudRegFile(file, courseId);
+			studentRegService.saveStudRegFile(file, courseId);
 		}
 		return "redirect:/courses/showStudentRegListOfCourse?courseId=" + courseId;
 	}

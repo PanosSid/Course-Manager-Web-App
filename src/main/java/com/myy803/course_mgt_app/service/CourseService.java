@@ -1,6 +1,5 @@
 package com.myy803.course_mgt_app.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,7 @@ public interface CourseService {
 
 	Course findCourseByCourseId(String theId);
 
-	Map<String, ArrayList<Double>> getCourseStatistics(List<StudentRegistration> studReg_list);
+	Map<String, List<Double>> getCourseStatistics(List<StudentRegistration> studReg_list);
 
 	List<Course> findCoursesByInstructorLogin(String username);
 

@@ -56,26 +56,11 @@ public class Course {
 	@JoinColumn(name = "student_course_id")
 	private List<StudentRegistration> studentReg;
 
-	public Course() {
-	}
+	public Course() {}
 
 	// used for csv parser
 	public Course(String courseId, String instructorLogin, String name, String semester, @Max(10) int year,
 			String syllabus) {
-		super();
-		this.courseId = courseId;
-		this.instructorLogin = instructorLogin;
-		this.name = name;
-		this.semester = semester;
-		this.year = year;
-		this.syllabus = syllabus;
-	}
-
-	public Course(@NotEmpty(message = "Course's id cannot be empty.") String courseId, String instructorLogin,
-			@NotEmpty(message = "Course's name cannot be empty.") String name,
-			@NotEmpty(message = "Course's semester cannot be empty.") String semester,
-			@NotNull(message = "The year of the course cannot be null.") @Max(10) @Min(1) Integer year,
-			@NotEmpty(message = "Course's syllabus cannot be null.") String syllabus) {
 		super();
 		this.courseId = courseId;
 		this.instructorLogin = instructorLogin;

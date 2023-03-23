@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class MaxStatisticStrategy extends TemplateStatisticStrategy{
 
-	
 	public MaxStatisticStrategy() {
 		super("Max");	// set name of the statistic
 	}
@@ -14,11 +13,6 @@ public class MaxStatisticStrategy extends TemplateStatisticStrategy{
 	@Override
 	public double doActualCalculation(DescriptiveStatistics ds) {
 		return ds.getMax();
-	}
-
-	@Override
-	public String getStrategyName() {
-		return super.getStatisticName();
 	}
 
 }

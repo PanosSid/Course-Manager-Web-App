@@ -21,8 +21,7 @@ public class StudentRegistrationServiceImpl implements StudentRegistrationServic
 	@Autowired
 	private StudentRegistrationDAO studentRegDao;
 
-	public StudentRegistrationServiceImpl() {
-	}
+	public StudentRegistrationServiceImpl() {}
 
 	@Override
 	public StudentRegistration save(StudentRegistration studReg) {
@@ -81,7 +80,6 @@ public class StudentRegistrationServiceImpl implements StudentRegistrationServic
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }

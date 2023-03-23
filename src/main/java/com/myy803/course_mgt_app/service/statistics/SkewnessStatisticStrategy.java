@@ -16,9 +16,4 @@ public class SkewnessStatisticStrategy extends TemplateStatisticStrategy{
 		return ds.getSkewness();
 	}
 
-	@Override
-	public String getStrategyName() {
-		return super.getStatisticName();
-	}
-
 }

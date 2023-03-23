@@ -15,10 +15,5 @@ public class PercentileStatisticStrategy extends TemplateStatisticStrategy{
 		return ds.getPercentile(50);
 	}
 
-	@Override
-	public String getStrategyName() {
-		return super.getStatisticName();
-	}
-
 }
 

@@ -1,17 +1,21 @@
 package com.myy803.course_mgt_app.service.statistics;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import com.myy803.course_mgt_app.model.StudentRegistration;
+import java.util.Map;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.commons.math3.util.Precision;
 import org.springframework.stereotype.Component;
+
+import com.myy803.course_mgt_app.model.StudentRegistration;
 
 
 @Component
 public abstract class TemplateStatisticStrategy implements StatisticStrategy{
 	
-	private String statisticName; 
+	protected String statisticName; 
 	
 	public TemplateStatisticStrategy() {}
 	
@@ -28,8 +32,11 @@ public abstract class TemplateStatisticStrategy implements StatisticStrategy{
 		this.statisticName = statisticName;
 	}
 	
-	private ArrayList<DescriptiveStatistics> prepareDataSet(List<StudentRegistration> studRegs) {
-		ArrayList<DescriptiveStatistics> dsList = new ArrayList<DescriptiveStatistics>();
+	abstract public double doActualCalculation(DescriptiveStatistics ds);
+	
+	private Map<String, DescriptiveStatistics> prepareDataSet(List<StudentRegistration> studRegs) {
+//		ArrayList<DescriptiveStatistics> dsList = new ArrayList<DescriptiveStatistics>();
+		Map<String, DescriptiveStatistics> dsMap = new HashMap<String, DescriptiveStatistics>();
 		
 		DescriptiveStatistics projectDs = new DescriptiveStatistics();
 		DescriptiveStatistics examDs = new DescriptiveStatistics();
@@ -45,35 +52,32 @@ public abstract class TemplateStatisticStrategy implements StatisticStrategy{
 			finalDs.addValue(finalGrade);
 		}
 		
-		dsList.add(projectDs);
-		dsList.add(examDs);
-		dsList.add(finalDs);
+		dsMap.put("project", projectDs);
+		dsMap.put("exam", examDs);
+		dsMap.put("final", finalDs);
 		
-		return  dsList;
+//		dsList.add(projectDs);
+//		dsList.add(examDs);
+//		dsList.add(finalDs);
+//		
+//		return  dsList;
+		return dsMap;
 	}
 	
 	@Override
-	public ArrayList<Double> calculateStatistcs(List<StudentRegistration> studRegs) {
+	public List<Double> calculateStatistcs(List<StudentRegistration> studRegs) {
+		Map<String, DescriptiveStatistics> dsMap =  prepareDataSet(studRegs);
+		double projectStat = doActualCalculation(dsMap.get("project"));	// calculate stat for project grade
+		double examStat = doActualCalculation(dsMap.get("exam"));	// calculate stat for exam grade
+		double finalStat = doActualCalculation(dsMap.get("final"));	// calculate stat for final grade
 
-		ArrayList<DescriptiveStatistics> dsList =  prepareDataSet(studRegs);
-		
-		double projectStat = doActualCalculation(dsList.get(0));	// calculate stat for project grade
-		double examStat = doActualCalculation(dsList.get(1));	// calculate stat for exam grade
-		double finalStat = doActualCalculation(dsList.get(2));	// calculate stat for final grade
-		
 		projectStat = Precision.round(projectStat, 3);
 		examStat = Precision.round(examStat, 3);
 		finalStat = Precision.round(finalStat, 3);
 		
-		ArrayList<Double> retStats = new ArrayList<Double>();
-		retStats.add(projectStat);
-		retStats.add(examStat);
-		retStats.add(finalStat);
-		
-		
-		return retStats;
+		return Arrays.asList(new Double[]{projectStat, examStat, finalStat});
 	}
 	
-	abstract public double doActualCalculation(DescriptiveStatistics ds);
+	
 	
 }
