@@ -28,11 +28,15 @@ public class CourseMgtAppController {
 
 	@Autowired
 	private StudentRegistrationService studentRegService;
-
+	
+	@RequestMapping("/")
+    public String index(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return "redirect:/courses/list?instructorLogin="+auth.getName();
+    }
+	
 	@RequestMapping("/courses/list")
-	public String listCourses(Model theModel) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String instructorLogin = auth.getName();
+	public String showCoursesList(Model theModel,  @RequestParam("instructorLogin") String instructorLogin) {
 		List<Course> coursesList = courseService.findCoursesByInstructorLogin(instructorLogin);
 		theModel.addAttribute("coursesList", coursesList);
 		theModel.addAttribute("instructorLogin", instructorLogin);
@@ -85,9 +89,10 @@ public class CourseMgtAppController {
 		return "/courses/course-statistics";
 	}
 
-	public void setStatsToModel(Model model, Map<String, List<Double>> statsMap) {
+	private void setStatsToModel(Model model, Map<String, List<Double>> statsMap) {
 		// ex. stasMap = {"Min" : [projectGrade, examGrade, finalGrade],
 		//		"Max" : [projectGrade,examGrade, finalGrade] ...}
+		
 		Map<String, Double> projectMap = new HashMap<String, Double>();
 		Map<String, Double> examMap = new HashMap<String, Double>();
 		Map<String, Double> finalMap = new HashMap<String, Double>();
@@ -115,7 +120,7 @@ public class CourseMgtAppController {
 		model.addAttribute("courseId", courseId);
 	}
 
-	public String getStudentRegTitle(Course theCourse) {
+	private String getStudentRegTitle(Course theCourse) {
 		return theCourse.getCourseId() + " " + theCourse.getName();
 	}
 

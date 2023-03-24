@@ -1,12 +1,19 @@
 package com.myy803.course_mgt_app.acceptance;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,11 +29,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.myy803.course_mgt_app.controller.CourseMgtAppController;
 import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.dao.StudentRegistrationDAO;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
-import com.myy803.course_mgt_app.controller.CourseMgtAppController;
 
 @SpringBootTest
 @TestPropertySource(
@@ -92,7 +100,7 @@ public class AcceptanceTestController {
 	void testUS2BrowseMyListOfCourses() throws Exception {
 		List<Course> coursesList = new ArrayList<Course>();	
 		coursesList.add(course);
-		mockMvc.perform(get("/courses/list")).
+		mockMvc.perform(get("/courses/list?instructorLogin=instructor_tester")).
 		andExpect(status().isOk()).
 		andExpect(model().attribute("instructorLogin", "instructor_tester")).
 		andExpect(model().attribute("coursesList", coursesList)).	// checks if the model attribute "coursesList" matches coursesList  
@@ -130,7 +138,7 @@ public class AcceptanceTestController {
 				.andExpect(redirectedUrl("/courses/list"));	
 	   
 	    // check if list of instructor_tester has the 2 courses
-	    mockMvc.perform(get("/courses/list")).
+	    mockMvc.perform(get("/courses/list?instructorLogin=instructor_tester")).
 		andExpect(status().isOk()).
 		andExpect(model().attribute("instructorLogin", "instructor_tester")).
 		andExpect(model().attribute("coursesList", coursesList)).
@@ -147,7 +155,7 @@ public class AcceptanceTestController {
 		andExpect(redirectedUrl("/courses/list"));	
 		
 		// check courses list of instructor_tester is empty
-		mockMvc.perform(get("/courses/list")).
+		mockMvc.perform(get("/courses/list?instructorLogin=instructor_tester")).
 		andExpect(status().isOk()).
 		andExpect(model().attribute("coursesList", new ArrayList<Course>())).	// model's coursesList must be empty
 		andExpect(view().name("courses/list-courses"));
@@ -190,7 +198,7 @@ public class AcceptanceTestController {
 		andExpect(redirectedUrl("/courses/list"));	
 		
 		// used to get the updated course 
-		MvcResult result2  = mockMvc.perform(get("/courses/list")).
+		MvcResult result2  = mockMvc.perform(get("/courses/list?instructorLogin=instructor_tester")).
 		andExpect(status().isOk()).
 		andExpect(model().attribute("instructorLogin", "instructor_tester2")).
 		andExpect(view().name("courses/list-courses")).
@@ -372,67 +380,30 @@ public class AcceptanceTestController {
 		@SuppressWarnings("unchecked")
 		Map<String, Double> finalMap = (Map<String, Double>) result.getModelAndView().getModel().get("finalMap");
 		
+		String statNames[] = {"Min", "Max", "Mean", "StandardDeviation", "Variance", "Skewness", "Percentile"};
+		double statProjectValues[] = {2.0, 10.0, 6.0, 4.0, 16.0, 0.0, 6.0};
+		double statExamValues[] = {1.5, 9.5, 5.0, 4.093, 16.75, 1.034, 4.0};
+		double statFinalValues[] = {2, 10, 5.667, 4.041, 16.333, 0.722, 5.0};
+		Map<String, Double> statProjectMap = setExpectedValuesToStatas(statProjectValues, statNames);
+		Map<String, Double> statExamMap = setExpectedValuesToStatas(statExamValues, statNames);
+		Map<String, Double> statFinalMap = setExpectedValuesToStatas(statFinalValues, statNames);
+		
 		for (Entry<String, Double> set :  projectMap.entrySet()) {
 			String statName = set.getKey();
-			
-			if (statName.equals("Min")) {
-				Assertions.assertEquals(projectMap.get(statName), 2.0);
-			} else if (statName.equals("Max")) {
-				Assertions.assertEquals(projectMap.get(statName), 10.0);
-			} else if (statName.equals("Mean")) {
-				Assertions.assertEquals(projectMap.get(statName), 6.0);
-			} else if (statName.equals("StandardDeviation")) {
-				Assertions.assertEquals(projectMap.get(statName), 4.0);
-			} else if (statName.equals("Variance")) {
-				Assertions.assertEquals(projectMap.get(statName), 16.0 );
-			} else if (statName.equals("Skewness")) {
-				Assertions.assertEquals(projectMap.get(statName), 0.0);
-			} else if (statName.equals("Percentile")) {
-				Assertions.assertEquals(projectMap.get(statName), 6.0 );
-			} 
+			for (int i = 0; i < statNames.length; i++) {
+				Assertions.assertEquals(statProjectMap.get(statName), projectMap.get(statName));
+				Assertions.assertEquals(statExamMap.get(statName), examMap.get(statName));
+				Assertions.assertEquals(statFinalMap.get(statName), finalMap.get(statName));
+			}
 		}
-		
-		for (Entry<String, Double> set :  examMap.entrySet()) {
-			String statName = set.getKey();
-			
-			if (statName.equals("Min")) {
-				Assertions.assertEquals(examMap.get(statName), 1.5);
-			} else if (statName.equals("Max")) {
-				Assertions.assertEquals(examMap.get(statName), 9.5);
-			} else if (statName.equals("Mean")) {
-				Assertions.assertEquals(examMap.get(statName), 5.0);
-			} else if (statName.equals("StandardDeviation")) {
-				Assertions.assertEquals(examMap.get(statName), 4.093);
-			} else if (statName.equals("Variance")) {
-				Assertions.assertEquals(examMap.get(statName), 16.75 );
-			} else if (statName.equals("Skewness")) {
-				Assertions.assertEquals(examMap.get(statName), 1.034);
-			} else if (statName.equals("Percentile")) {
-				Assertions.assertEquals(examMap.get(statName), 4.0 );
-			} 
+	}
+
+	public Map<String, Double> setExpectedValuesToStatas(double[] statProjectValues, String[] statNames) {
+		Map<String, Double> statMap = new HashMap<String, Double>();
+		for (int i = 0; i < statNames.length; i++) {
+			statMap.put(statNames[i], statProjectValues[i]);			
 		}
-		
-		for (Entry<String, Double> set :  finalMap.entrySet()) {
-			String statName = set.getKey();
-			
-			if (statName.equals("Min")) {
-				Assertions.assertEquals(finalMap.get(statName), 2);
-			} else if (statName.equals("Max")) {
-				Assertions.assertEquals(finalMap.get(statName), 10);
-			} else if (statName.equals("Mean")) {
-				Assertions.assertEquals(finalMap.get(statName), 5.667);
-			} else if (statName.equals("StandardDeviation")) {
-				Assertions.assertEquals(finalMap.get(statName), 4.041);
-			} else if (statName.equals("Variance")) {
-				Assertions.assertEquals(finalMap.get(statName), 16.333);
-			} else if (statName.equals("Skewness")) {
-				Assertions.assertEquals(finalMap.get(statName), 0.722);
-			} else if (statName.equals("Percentile")) {
-				Assertions.assertEquals(finalMap.get(statName), 5.0 );
-			} 
-		}
-		
-		
+		return statMap;
 	}
 	
 	@AfterEach
