@@ -21,7 +21,18 @@ public class StudentRegistrationServiceImpl implements StudentRegistrationServic
 	@Autowired
 	private StudentRegistrationDAO studentRegDao;
 
-	public StudentRegistrationServiceImpl() {}
+	public StudentRegistrationServiceImpl() {
+	}
+
+	@Override
+	public StudentRegistration findStudentRegistrationByStudentId(int id) {
+		return studentRegDao.findStudentRegistrationByStudentId(id);
+	}
+
+	@Override
+	public List<StudentRegistration> findStudentRegistrationsByCourseId(String courseId) {
+		return studentRegDao.findStudentRegistrationByCourseId(courseId);
+	}
 
 	@Override
 	public StudentRegistration save(StudentRegistration studReg) {
@@ -34,19 +45,20 @@ public class StudentRegistrationServiceImpl implements StudentRegistrationServic
 	}
 
 	@Override
-	public StudentRegistration findStudentRegistrationByStudentId(int id) {
-		return studentRegDao.findStudentRegistrationByStudentId(id);
-	}
-
-	@Override
 	public void deleteByStudentId(int theId) {
 		StudentRegistration sr = studentRegDao.findStudentRegistrationByStudentId(theId);
 		studentRegDao.delete(sr);
 	}
 
 	@Override
-	public List<StudentRegistration> findStudentRegistrationsByCourseId(String courseId) {
-		return studentRegDao.findStudentRegistrationByCourseId(courseId);
+	public void saveStudRegFile(MultipartFile file, String courseId) {
+		List<StudentRegistration> studRegs;
+		try {
+			studRegs = csvToStudentRegistration(file.getInputStream(), courseId);
+			studentRegDao.saveAll(studRegs);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private List<StudentRegistration> csvToStudentRegistration(InputStream is, String courseId) {
@@ -68,17 +80,6 @@ public class StudentRegistrationServiceImpl implements StudentRegistrationServic
 			return listStudReg;
 		} catch (IOException e) {
 			throw new RuntimeException("fail to parse CSV file: " + e.getMessage());
-		}
-	}
-
-	@Override
-	public void saveStudRegFile(MultipartFile file, String courseId) {
-		List<StudentRegistration> studRegs;
-		try {
-			studRegs = csvToStudentRegistration(file.getInputStream(), courseId);
-			studentRegDao.saveAll(studRegs);
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 

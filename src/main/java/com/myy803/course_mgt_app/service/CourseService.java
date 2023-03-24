@@ -9,17 +9,17 @@ import com.myy803.course_mgt_app.model.*;
 @Service
 public interface CourseService {
 
+	Course findCourseByCourseId(String theId);
+	
+	List<Course> findCoursesByInstructorLogin(String username);
+	
+	Course save(Course course);
+	
 	void delete(Course course);
 
 	void deleteByCourseId(String courseId);
 
-	Course findCourseByCourseId(String theId);
-
 	Map<String, List<Double>> getCourseStatistics(List<StudentRegistration> studReg_list);
-
-	List<Course> findCoursesByInstructorLogin(String username);
-
-	Course save(Course course);
 
 	void saveCoursesFromFile(MultipartFile file, String instructorLogin);
 

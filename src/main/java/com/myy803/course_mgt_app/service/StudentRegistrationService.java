@@ -10,13 +10,13 @@ import com.myy803.course_mgt_app.model.*;
 @Service
 public interface StudentRegistrationService {
 
+	StudentRegistration findStudentRegistrationByStudentId(int id);
+	
+	List<StudentRegistration> findStudentRegistrationsByCourseId(String courseId);
+
 	StudentRegistration save(StudentRegistration studReg);
 
 	void delete(StudentRegistration studReg);
-
-	StudentRegistration findStudentRegistrationByStudentId(int id);
-
-	List<StudentRegistration> findStudentRegistrationsByCourseId(String courseId);
 
 	void deleteByStudentId(int id);
 

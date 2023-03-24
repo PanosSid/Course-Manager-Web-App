@@ -29,38 +29,37 @@ public class CourseServiceImp implements CourseService {
 	@Autowired
 	private List<StatisticStrategy> statCalculationStrategies;
 
-	public CourseServiceImp() {
-	}
-
+	public CourseServiceImp() {}
+	
 	public void setStatCalculationStrategies(List<StatisticStrategy> statCalculationStrategies) {
 		this.statCalculationStrategies = statCalculationStrategies;
-	}
-
-	@Override
-	public void deleteByCourseId(String courseId) {
-		Course c = courseDao.findCourseByCourseId(courseId);
-		courseDao.delete(c);
 	}
 
 	@Override
 	public Course findCourseByCourseId(String theId) {
 		return courseDao.findCourseByCourseId(theId);
 	}
-
+	
 	@Override
 	public List<Course> findCoursesByInstructorLogin(String username) {
 		List<Course> list = courseDao.findCoursesByInstructorLogin(username);
 		return list;
 	}
-
+	
 	@Override
 	public Course save(Course course) {
 		return courseDao.save(course);
 	}
-
+	
 	@Override
 	public void delete(Course course) {
 		courseDao.delete(course);
+	}
+	
+	@Override
+	public void deleteByCourseId(String courseId) {
+		Course c = courseDao.findCourseByCourseId(courseId);
+		courseDao.delete(c);
 	}
 
 	@Override
@@ -72,6 +71,18 @@ public class CourseServiceImp implements CourseService {
 			mapCalcs.put(stratName, gradesStats);
 		}
 		return mapCalcs;
+	}
+	
+	@Override
+	public void saveCoursesFromFile(MultipartFile file, String instructorLogin) {
+		List<Course> Courses;
+		try {
+			Courses = csvToCourses(file.getInputStream(), instructorLogin);
+			courseDao.saveAll(Courses);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	private List<Course> csvToCourses(InputStream is, String instructorLogin) {
@@ -93,17 +104,4 @@ public class CourseServiceImp implements CourseService {
 			throw new RuntimeException("fail to parse CSV file");
 		}
 	}
-
-	@Override
-	public void saveCoursesFromFile(MultipartFile file, String instructorLogin) {
-		List<Course> Courses;
-		try {
-			Courses = csvToCourses(file.getInputStream(), instructorLogin);
-			courseDao.saveAll(Courses);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 }
