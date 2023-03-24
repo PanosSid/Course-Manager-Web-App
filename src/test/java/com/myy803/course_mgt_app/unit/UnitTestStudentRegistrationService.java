@@ -23,6 +23,8 @@ public class UnitTestStudentRegistrationService {
 	@Mock
 	private StudentRegistrationDAO studRegDAO;
 	
+	private	StudentRegistration testStudent = new StudentRegistration (11, "StudTmp1", "StudSurname", 2000,"1","1","TTT-000", 1, 2);
+	
 	@Test
 	void testStudentRegistrationServiceImplIsNotNull() {
 		Assertions.assertNotNull(studRegService);
@@ -30,11 +32,10 @@ public class UnitTestStudentRegistrationService {
 	
 	@Test
 	void testfindStudentRegistrationByStudentIdReturndStudReg() {
-		StudentRegistration newStudent = new StudentRegistration (11, "StudTmp1", "StudSurname", 2000,"1","1","TTT-000", 1, 2);
-		Mockito.when(studRegDAO.findStudentRegistrationByStudentId(11)).thenReturn(newStudent);
+		Mockito.when(studRegDAO.findStudentRegistrationByStudentId(11)).thenReturn(testStudent);
 		StudentRegistration storedStudReg = studRegService.findStudentRegistrationByStudentId(11);
 		Assertions.assertNotNull(storedStudReg);
-		Assertions.assertEquals(newStudent, storedStudReg);
+		Assertions.assertEquals(testStudent, storedStudReg);
 	}
 	
 	@Test
@@ -60,26 +61,23 @@ public class UnitTestStudentRegistrationService {
 	
 	@Test
 	void testSave() {
-		StudentRegistration newStudent = new StudentRegistration (11, "StudTmp1", "StudSurname", 2000,"1","1","TTT-000", 1, 2);
-		Mockito.when(studRegDAO.save(newStudent)).thenReturn(newStudent);
-		StudentRegistration savedStudent = studRegService.save(newStudent);
+		Mockito.when(studRegDAO.save(testStudent)).thenReturn(testStudent);
+		StudentRegistration savedStudent = studRegService.save(testStudent);
 		Mockito.verify(studRegDAO, Mockito.times(1)).save(savedStudent);
 	}
 	
 	@Test
 	void testDelete() {
-		StudentRegistration newStudent = new StudentRegistration (159, 1111, "StudTmp1", "StudSurname", 2000,"1","1","TTT-000", 1.0, 2.0);
-		studRegService.delete(newStudent);
-		Mockito.verify(studRegDAO, Mockito.times(1)).delete(newStudent);
+		studRegService.delete(testStudent);
+		Mockito.verify(studRegDAO, Mockito.times(1)).delete(testStudent);
 	}
 	
 	@Test 
 	void testDeleteByStudentId() {
-		StudentRegistration newStudent = new StudentRegistration (159, 1111, "StudTmp1", "StudSurname", 2000,"1","1","TTT-000", 1.0, 2.0);
-		Mockito.when(studRegDAO.findStudentRegistrationByStudentId(1111)).thenReturn(newStudent);	
+		Mockito.when(studRegDAO.findStudentRegistrationByStudentId(1111)).thenReturn(testStudent);	
 		studRegService.deleteByStudentId(1111);
 		Mockito.verify(studRegDAO, Mockito.times(1)).findStudentRegistrationByStudentId(1111);
-		Mockito.verify(studRegDAO, Mockito.times(1)).delete(newStudent);;
+		Mockito.verify(studRegDAO, Mockito.times(1)).delete(testStudent);;
 	}
 	
 	//TODO add test for saveStudentRegsFromFile()
