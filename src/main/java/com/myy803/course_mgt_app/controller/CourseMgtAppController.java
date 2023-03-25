@@ -29,18 +29,17 @@ public class CourseMgtAppController {
 	@Autowired
 	private StudentRegistrationService studentRegService;
 	
-	@RequestMapping("/")
-    public String index(Model model) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return "redirect:/courses/list?instructorLogin="+auth.getName();
-    }
-	
 	@RequestMapping("/courses/list")
-	public String showCoursesList(Model theModel,  @RequestParam("instructorLogin") String instructorLogin) {
-		List<Course> coursesList = courseService.findCoursesByInstructorLogin(instructorLogin);
+	public String showCoursesList(Model theModel) {
+		String insturctorLoginField = getAuthenticatedInstuctorLogin();
+		List<Course> coursesList = courseService.findCoursesByInstructorLogin(insturctorLoginField);
 		theModel.addAttribute("coursesList", coursesList);
-		theModel.addAttribute("instructorLogin", instructorLogin);
+		theModel.addAttribute("instructorLogin", insturctorLoginField);
 		return "courses/list-courses";
+	}
+	
+	protected String getAuthenticatedInstuctorLogin() {
+		return SecurityContextHolder.getContext().getAuthentication().getName();
 	}
 
 	@RequestMapping("/courses/deleteCourse")
@@ -183,8 +182,7 @@ public class CourseMgtAppController {
 
 	@PostMapping("/upload")
 	public String uploadCourseFile(@RequestParam("file") MultipartFile file) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		String instructorLogin = auth.getName();
+		String instructorLogin = getAuthenticatedInstuctorLogin();
 		if ("text/csv".equals(file.getContentType())) { // check if file has csv format
 			courseService.saveCoursesFromFile(file, instructorLogin);
 		}

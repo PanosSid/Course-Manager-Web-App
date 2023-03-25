@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,13 +11,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
-import com.myy803.course_mgt_app.controller.CourseMgtAppController;
+import org.springframework.web.multipart.MultipartFile;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.CourseService;
@@ -32,34 +30,33 @@ public class UnitTestController {
 
 	@Mock
 	private StudentRegistrationService studRegService;
-
+	
+	@Mock
+	private Model model;
+	
 	@InjectMocks
-	private CourseMgtAppController controller;
+	private FakeCourseMgtController controller;
 
-	private Model model = new ConcurrentModel();
+	protected static String INSTRUCTOR_LOGIN = "panos_tester";
 
 	@Test
 	void testControllerIsNotNull() {
-		Assertions.assertNotNull(controller);
+		Assertions.assertNotNull(controller); 	// sanity check
 	}
-
+	
 	@Test
 	void testListCouresesReturnsPageWithCoursesList() throws Exception {
-		Course newCourse1 = new Course(1, "TMP-123", "panos_tester", "TmpCourse1", "1st", 1, "...");
-		Course newCourse2 = new Course(2, "TMP-456", "panos_tester", "TmpCourse2", "1st", 1, "...");
-		Course newCourse3 = new Course(3, "TMP-789", "panos_tester", "TmpCourse3", "1st", 1, "...");
+		List<Course> mockedCourses = new ArrayList<Course>();
+		mockedCourses.add(new Course(1, "TMP-123", INSTRUCTOR_LOGIN, "TmpCourse1", "1st", 1, "..."));
+		mockedCourses.add(new Course(2, "TMP-456", INSTRUCTOR_LOGIN, "TmpCourse2", "1st", 1, "..."));
+		mockedCourses.add(new Course(3, "TMP-789", INSTRUCTOR_LOGIN, "TmpCourse3", "1st", 1, "..."));
 
-		List<Course> mockedList = new ArrayList<Course>();
-		mockedList.add(newCourse1);
-		mockedList.add(newCourse2);
-		mockedList.add(newCourse3);
-		Mockito.when(courseService.findCoursesByInstructorLogin("panos_tester")).thenReturn(mockedList);
-
-		String actualFilePath = controller.showCoursesList(model, "panos_tester");
-		Assertions.assertEquals("courses/list-courses", actualFilePath);
-		Assertions.assertEquals("panos_tester", model.getAttribute("instructorLogin"));
-		Assertions.assertEquals(mockedList, model.getAttribute("coursesList"));
-
+		Mockito.when(courseService.findCoursesByInstructorLogin(INSTRUCTOR_LOGIN)).thenReturn(mockedCourses);
+		String actualViewName = controller.showCoursesList(model);
+		
+		Assertions.assertEquals("courses/list-courses", actualViewName);
+		Mockito.verify(model).addAttribute("coursesList", mockedCourses);
+		Mockito.verify(model).addAttribute("instructorLogin", INSTRUCTOR_LOGIN);
 	}
 
 	@Test
@@ -70,13 +67,13 @@ public class UnitTestController {
 
 	@Test
 	void testShowFormForAddCourseReturnsPage() throws Exception {
-		String actualCourseFormFile = controller.showFormForAddCourse(model, "panos_tester");
+		String actualCourseFormFile = controller.showFormForAddCourse(model, INSTRUCTOR_LOGIN);
 		Assertions.assertEquals("courses/course-form", actualCourseFormFile);
 	}
 
 	@Test
 	void testShowFormForUpdateCourseReturnsPage() throws Exception {
-		Course course = new Course("MCK-000", "panos_tester", "MockCourse", "1st", 1, "...");
+		Course course = new Course("MCK-000", INSTRUCTOR_LOGIN, "MockCourse", "1st", 1, "...");
 		Mockito.when(courseService.findCourseByCourseId("MCK-000")).thenReturn(course);
 		String actualCoursesFormFile = controller.showFormForUpdateCourse(course.getCourseId(), model);
 		Assertions.assertEquals("courses/course-form", actualCoursesFormFile);
@@ -84,7 +81,7 @@ public class UnitTestController {
 
 	@Test
 	void testSaveCourseHappyPath() throws Exception {
-		Course course = new Course("MCK-000", "panos_tester", "MockCourse", "1st", 1, "...");
+		Course course = new Course("MCK-000", INSTRUCTOR_LOGIN, "MockCourse", "1st", 1, "...");
 		MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
 		multiValueMap.add("courseId", course.getCourseId());
 		multiValueMap.add("instructorLogin", course.getInstructorLogin());
@@ -103,7 +100,7 @@ public class UnitTestController {
 
 	@Test
 	void testShowStatisticsOfCourse() throws Exception {
-		Course course = new Course("MCK-000", "panos_tester", "MockCourse", "1st", 1, "...");
+		Course course = new Course("MCK-000", INSTRUCTOR_LOGIN, "MockCourse", "1st", 1, "...");
 		Mockito.when(courseService.findCourseByCourseId("MCK-000")).thenReturn(course);
 
 		List<StudentRegistration> studRegList = new ArrayList<StudentRegistration>();
@@ -118,25 +115,21 @@ public class UnitTestController {
 
 		String actualCourseStatsPath = controller.showStatisticsOfCourse("MCK-000", model);
 		Assertions.assertEquals("/courses/course-statistics", actualCourseStatsPath);
-		Assertions.assertEquals(1.0, model.getAttribute("ProjectMin"));
-		Assertions.assertEquals(2.0, model.getAttribute("ExamMin"));
-		Assertions.assertEquals(3.0, model.getAttribute("FinalMin"));
-
+		Mockito.verify(model).addAttribute("ProjectMin", 1.0);
+		Mockito.verify(model).addAttribute("ExamMin", 2.0);
+		Mockito.verify(model).addAttribute("FinalMin", 3.0);
 	}
 
 	@Test
 	void testShowStudentRegListOfCourseReturnsPage() throws Exception {
 		List<StudentRegistration> studReg_list = new ArrayList<StudentRegistration>();
-		StudentRegistration student1 = new StudentRegistration(1999, "StudMock1", "", 1, "1", "1", "MCK-000", 1, 2);
-		StudentRegistration student2 = new StudentRegistration(1998, "StudMock2", "", 1, "1", "1", "MCK-000", 1, 2);
-		StudentRegistration student3 = new StudentRegistration(1997, "StudMock3", "", 1, "1", "1", "MCK-000", 1, 2);
-		studReg_list.add(student1);
-		studReg_list.add(student2);
-		studReg_list.add(student3);
+		studReg_list.add(new StudentRegistration(1999, "StudMock1", "", 1, "1", "1", "MCK-000", 1, 2));
+		studReg_list.add(new StudentRegistration(1998, "StudMock2", "", 1, "1", "1", "MCK-000", 1, 2));
+		studReg_list.add(new StudentRegistration(1997, "StudMock3", "", 1, "1", "1", "MCK-000", 1, 2));
 
 		Mockito.when(studRegService.findStudentRegistrationsByCourseId("MCK-000")).thenReturn(studReg_list);
 		Mockito.when(courseService.findCourseByCourseId("MCK-000"))
-				.thenReturn(new Course("MCK-000", "panos_tester", "MockCourse", "1st", 1, "..."));
+				.thenReturn(new Course("MCK-000", INSTRUCTOR_LOGIN, "MockCourse", "1st", 1, "..."));
 
 		String actualStudRegListFile = controller.showStudentRegListOfCourse("MCK-000", model);
 		Assertions.assertEquals("/studentRegistration/list-studentRegistrations", actualStudRegListFile);
@@ -156,9 +149,8 @@ public class UnitTestController {
 		StudentRegistration modelStudReg = new StudentRegistration();
 		modelStudReg.setCourseId("MCK-000");
 		controller.showFormForAddStudentRegistration(model, "MCK-000");
-		Assertions.assertEquals(modelStudReg, model.getAttribute("studentReg"));
-		Assertions.assertEquals("MCK-000", model.getAttribute("courseId"));
-
+		Mockito.verify(model).addAttribute("studentReg", modelStudReg);
+		Mockito.verify(model).addAttribute("courseId", "MCK-000");
 	}
 
 	@Test
@@ -167,9 +159,9 @@ public class UnitTestController {
 		mckStud.setCourseId("MCK-000");
 		Mockito.when(studRegService.findStudentRegistrationByStudentId(1111)).thenReturn(mckStud);
 		String actualTemplate = controller.showFormForUpdateStudentReg(model, 1111);
-		Assertions.assertEquals("/studentRegistration/studentReg-form", actualTemplate);
-		Assertions.assertEquals(mckStud, model.getAttribute("studentReg"));
-		Assertions.assertEquals("MCK-000", model.getAttribute("courseId"));
+		Assertions.assertEquals("/studentRegistration/studentReg-form", actualTemplate);	
+		Mockito.verify(model).addAttribute("studentReg", mckStud);
+		Mockito.verify(model).addAttribute("courseId", "MCK-000");
 	}
 
 	@Test
@@ -192,7 +184,24 @@ public class UnitTestController {
 
 		String actualRedirectFile = controller.saveStudentRegistration(tmpStudent, result, model);
 		Assertions.assertEquals("redirect:/courses/showStudentRegListOfCourse?courseId=MCK-000", actualRedirectFile);
-
+	}
+	
+	@Test 
+	void testUploadCourseFile() {
+		MultipartFile fileMock = Mockito.mock(MultipartFile.class);
+		Mockito.when(fileMock.getContentType()).thenReturn("text/csv");
+		String redirectedView = controller.uploadCourseFile(fileMock);
+		Assertions.assertEquals("redirect:/courses/list", redirectedView);
+		Mockito.verify(courseService, Mockito.times(1)).saveCoursesFromFile(fileMock, INSTRUCTOR_LOGIN);
+	}
+	
+	@Test 
+	void testUploadStudentRegFile() {
+		MultipartFile fileMock = Mockito.mock(MultipartFile.class);
+		Mockito.when(fileMock.getContentType()).thenReturn("text/csv");
+		String redirectedView = controller.uploadStudentRegFile(fileMock, "MCK-000");
+		Assertions.assertEquals("redirect:/courses/showStudentRegListOfCourse?courseId=MCK-000", redirectedView);
+		Mockito.verify(studRegService, Mockito.times(1)).saveStudRegFile(fileMock, "MCK-000");
 	}
 
 }
