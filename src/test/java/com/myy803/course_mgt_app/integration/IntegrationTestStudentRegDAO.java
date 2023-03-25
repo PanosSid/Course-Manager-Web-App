@@ -2,58 +2,82 @@ package com.myy803.course_mgt_app.integration;
 
 import java.util.List;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.TestPropertySource;
-import com.myy803.course_mgt_app.model.StudentRegistration;
-import com.myy803.course_mgt_app.dao.StudentRegistrationDAO;
 
-@SpringBootTest
-@TestPropertySource(
-  locations = "classpath:application.properties")
+import com.myy803.course_mgt_app.dao.CourseDAO;
+import com.myy803.course_mgt_app.dao.StudentRegistrationDAO;
+import com.myy803.course_mgt_app.model.Course;
+import com.myy803.course_mgt_app.model.StudentRegistration;
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource(locations = "classpath:application.properties")
 public class IntegrationTestStudentRegDAO {
 
 	@Autowired 
-	StudentRegistrationDAO studRegDao;
+	private StudentRegistrationDAO studRegDao;
 	
+	@Autowired
+	private TestEntityManager entityManager;
+	
+	private StudentRegistration testStudReg = new StudentRegistration(11, "StudTmp1", "StudSurname", 2000,"1","1","MCK-000", 1, 2);
+	
+	
+	@BeforeAll
+	static void setUpDBwithTestCourseForForeignKeyConstrain(@Autowired CourseDAO courseDao) {
+		courseDao.save(new Course("MCK-000", "instructor_tester2", "TmpCourse", "1st", 1, "..."));
+	}
+	
+	@BeforeEach
+	void setUpDBwithTestStudReg() {
+		entityManager.persist(testStudReg);
+	}
 	
 	@Test
 	void testfindStudentRegistrationById() {
-		StudentRegistration storedStudReg =  studRegDao.findStudentRegistrationByStudentId(100);
+		entityManager.persist(testStudReg);
+		StudentRegistration storedStudReg = studRegDao.findStudentRegistrationByStudentId(11);
 		Assertions.assertNotNull(storedStudReg);
-		Assertions.assertEquals(100, storedStudReg.getStudentId());
+		Assertions.assertEquals(testStudReg, storedStudReg);
 	}
 	
 	@Test
 	void testfindStudentRegistrationByCourseId() {
-		List<StudentRegistration> storedStudRegs =  studRegDao.findStudentRegistrationByCourseId("MCK-000");
-		Assertions.assertNotNull(storedStudRegs);
-		Assertions.assertEquals(1, storedStudRegs.size());
-		Assertions.assertEquals(100, storedStudRegs.get(0).getStudentId());
+		StudentRegistration testStudReg2 = new StudentRegistration(22, "StudTmp2", "StudSurname2", 2000,"1","1","MCK-000", 1, 2);
+		entityManager.persist(testStudReg);
+		entityManager.persist(testStudReg2);
+		List<StudentRegistration> storedStudRegs = studRegDao.findStudentRegistrationsByCourseId("MCK-000");
+		Assertions.assertEquals(testStudReg, storedStudRegs.get(0));
+		Assertions.assertEquals(testStudReg2, storedStudRegs.get(1));
 	}
-	
 	
 	@Test
 	void testSave() {
-		StudentRegistration newStudent = new StudentRegistration (11, "StudTmp1", "StudSurname", 2000,"1","1","MCK-000", 1, 2);
-		studRegDao.save(newStudent);
-		StudentRegistration savedStudent =  studRegDao.findStudentRegistrationByStudentId(11);
+		StudentRegistration savedStudent = studRegDao.save(testStudReg);
 		Assertions.assertNotNull(savedStudent);
-		Assertions.assertEquals(savedStudent, newStudent);
-		studRegDao.delete(savedStudent);	// delete tmp row 
+		Assertions.assertEquals(testStudReg, savedStudent);
 	}
 	
 	@Test
 	void testDelete() {
-		StudentRegistration newStudent = new StudentRegistration (11, "StudTmp1", "StudSurname", 2000,"1","1","MCK-000", 1, 2);
-		studRegDao.save(newStudent );
-		studRegDao.delete(newStudent);	// clean db from tmp course
+		entityManager.persist(testStudReg);
+		studRegDao.delete(testStudReg);	// clean db from tmp course
 		StudentRegistration savedStudent = studRegDao.findStudentRegistrationByStudentId(11);
 		Assertions.assertNull(savedStudent);
 	}
 	
-	
-	
+	@AfterAll
+	static void teadDownDBwithTestCourse(@Autowired CourseDAO courseDao) {
+		courseDao.delete(new Course("MCK-000", "instructor_tester2", "TmpCourse", "1st", 1, "..."));
+	}
+
 }

@@ -8,7 +8,7 @@ import com.myy803.course_mgt_app.model.StudentRegistration;
 @Repository
 public interface StudentRegistrationDAO extends JpaRepository<StudentRegistration, Integer> {
 	
-	List<StudentRegistration> findStudentRegistrationByCourseId(String courseid);
+	List<StudentRegistration> findStudentRegistrationsByCourseId(String courseid);
 	
 	StudentRegistration findStudentRegistrationByStudentId(int id);
 
