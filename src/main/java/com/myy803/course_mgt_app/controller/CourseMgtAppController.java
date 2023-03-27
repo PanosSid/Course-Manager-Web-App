@@ -115,18 +115,18 @@ public class CourseMgtAppController {
 
 	public void setStatistcsPageTile(String courseId, Model model) {
 		Course theCourse = courseService.findCourseByCourseId(courseId);
-		model.addAttribute("studRegTitle", getStudentRegTitle(theCourse));
+		model.addAttribute("studRegTitle", getStudentRegPageTitle(theCourse));
 		model.addAttribute("courseId", courseId);
 	}
 
-	private String getStudentRegTitle(Course theCourse) {
+	private String getStudentRegPageTitle(Course theCourse) {
 		return theCourse.getCourseId() + " " + theCourse.getName();
 	}
 
 	@RequestMapping("/courses/showStudentRegListOfCourse")
 	public String showStudentRegListOfCourse(@RequestParam("courseId") String courseId, Model theModel) {
 		Course theCourse = courseService.findCourseByCourseId(courseId);
-		theModel.addAttribute("studRegTitle", getStudentRegTitle(theCourse));
+		theModel.addAttribute("studRegTitle", getStudentRegPageTitle(theCourse));
 		theModel.addAttribute("courseId", courseId);
 		theModel.addAttribute("studRegList", studentRegService
 				.findStudentRegistrationsByCourseId(courseId));

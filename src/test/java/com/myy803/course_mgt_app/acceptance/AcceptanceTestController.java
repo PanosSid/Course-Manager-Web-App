@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.persistence.EntityManager;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,8 +42,9 @@ import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 
 @SpringBootTest
-@TestPropertySource(
-  locations = "classpath:application.properties")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource(locations = "classpath:application-test.properties")
+@AutoConfigureTestEntityManager
 @AutoConfigureMockMvc
 public class AcceptanceTestController {
 	
@@ -62,8 +63,10 @@ public class AcceptanceTestController {
 	@Autowired
 	private CourseMgtAppController controller;
 	
+	@Autowired
+	private TestEntityManager entityManager;
 
-	private Course course;
+	private Course course = new Course("TTT-000", "instructor_tester", "CourseTest", "2nd", 1, "This is a dummy course used only for testing");
 	
 	private List<StudentRegistration> listStudRegs;
 
@@ -73,9 +76,7 @@ public class AcceptanceTestController {
           .webAppContextSetup(context)
           .build();
 		
-		course = new Course("TTT-000", "instructor_tester", "CourseTest", "2nd", 1, "This is a dummy course used only for testing");
 		courseDao.save(course);
-		
 		StudentRegistration student1 = new StudentRegistration (11, "TopStud", "StudSurnam1e", 2018,"4th","8th","TTT-000", 10, 9.5);
 		StudentRegistration student2 = new StudentRegistration (22, "AverageStud", "StudSurname2", 2017,"5th","9th","TTT-000", 6, 4);
 		StudentRegistration student3 = new StudentRegistration (33, "BadStud", "StudSurname3", 2013,"5th","10th","TTT-000", 2, 1.5);
@@ -173,7 +174,7 @@ public class AcceptanceTestController {
 	void testUS5UpdateCourseFields() throws Exception{
 		// simulates the course from the db 
 		Course courseFromDb = new Course("MCK-000", "instructor_tester2", "Tes5tCo(urse", "4", 2, "Used for testing (fix typos)");
-		
+		courseDao.save(courseFromDb);
 		MvcResult result  = mockMvc.perform(get("/courses/showFormForUpdateCourse?courseId=MCK-000")).
 		andExpect(status().isOk()).
 		andExpect(model().attribute("course", courseFromDb)).
@@ -216,7 +217,9 @@ public class AcceptanceTestController {
 		
 		//restore course with typos for the next test run
 		Course initialCourseFromDb = new Course(courseFromForm.getDbKey(),"MCK-000", "instructor_tester2", "Tes5tCo(urse", "4", 2, "Used for testing (fix typos)");
-		courseDao.save(initialCourseFromDb);	
+		courseDao.save(initialCourseFromDb);
+		
+		courseDao.delete(courseFromDb);
 		
 	}
 	
@@ -235,6 +238,7 @@ public class AcceptanceTestController {
 	void testUS7AddStudRegToList() throws Exception {
 		// student to be saved
 		StudentRegistration tmpStudent = new StudentRegistration (44, "Tmp", "TmpStud", 2018,"2nd","8th","TTT-000", 7, 6);
+
 		
 		MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
 	    multiValueMap.add("studentId", Integer.toString(tmpStudent.getStudentId()));
@@ -261,6 +265,7 @@ public class AcceptanceTestController {
 	    andExpect(status().isOk()).
 	    andExpect(model().attribute("studRegList", listStudRegs)).
 	    andExpect(view().name("/studentRegistration/list-studentRegistrations"));
+	    
 	   
 	}
 	
@@ -286,7 +291,8 @@ public class AcceptanceTestController {
 	void testUS9US10UpdateStudRegFields() throws Exception {
 		// this student is already saved in the db, we use it to check 
 		// if the below get request returns the correct student from the db
-		StudentRegistration studentFromDb = studRegDao.findStudentRegistrationByStudentId(100);
+		StudentRegistration studentFromDb = new StudentRegistration (100, "TestStudent", "SurrrnameA", 2020,"5","4","TTT-000", 7.0, 3.5);
+		studRegDao.save(studentFromDb);
 		
 		MvcResult updtFormResult = mockMvc.perform(get("/studentRegistrations/showFormForUpdateStudentReg?studentRegId=100")).
 		andExpect(status().isOk()).
@@ -295,51 +301,40 @@ public class AcceptanceTestController {
 		andReturn();
 		
 		// get the actual returned student from the above request
-		StudentRegistration updtStud = (StudentRegistration) updtFormResult.getModelAndView().getModel().get("studentReg");
+		StudentRegistration studentToBeUpdated = (StudentRegistration) updtFormResult.getModelAndView().getModel().get("studentReg");
 		
 		// update some of its fields
-		updtStud.setStudentId(109);
-		updtStud.setLastName("SurnameA");
-		updtStud.setProjectGrade(8.0);
-		updtStud.setExamGrade(4.0);
+		studentToBeUpdated.setStudentId(109);
+		studentToBeUpdated.setLastName("SurnameA");
+		studentToBeUpdated.setProjectGrade(8.0);
+		studentToBeUpdated.setExamGrade(4.0);
 		
 		MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
-		multiValueMap.add("dbKeyStudReg", Integer.toString(updtStud.getDbKeyStudReg()));
-	    multiValueMap.add("studentId", Integer.toString(updtStud.getStudentId()));
-	    multiValueMap.add("firstName", updtStud.getFirstName());
-	    multiValueMap.add("lastName", updtStud.getLastName());
-	    multiValueMap.add("yearOfStudies",updtStud.getYearOfStudies());
-	    multiValueMap.add("semester"	, updtStud.getSemester());
-	    multiValueMap.add("courseId"	, updtStud.getCourseId());
-	    multiValueMap.add("yearOfRegistration"	,Integer.toString(updtStud.getYearOfRegistration()));
-	    multiValueMap.add("projectGrade"	,Double.toString(updtStud.getProjectGrade()));
-	    multiValueMap.add("examGrade"	,Double.toString(updtStud.getExamGrade()));
+		multiValueMap.add("dbKeyStudReg", Integer.toString(studentToBeUpdated.getDbKeyStudReg()));
+	    multiValueMap.add("studentId", Integer.toString(studentToBeUpdated.getStudentId()));
+	    multiValueMap.add("firstName", studentToBeUpdated.getFirstName());
+	    multiValueMap.add("lastName", studentToBeUpdated.getLastName());
+	    multiValueMap.add("yearOfStudies",studentToBeUpdated.getYearOfStudies());
+	    multiValueMap.add("semester"	, studentToBeUpdated.getSemester());
+	    multiValueMap.add("courseId"	, studentToBeUpdated.getCourseId());
+	    multiValueMap.add("yearOfRegistration"	,Integer.toString(studentToBeUpdated.getYearOfRegistration()));
+	    multiValueMap.add("projectGrade"	,Double.toString(studentToBeUpdated.getProjectGrade()));
+	    multiValueMap.add("examGrade"	,Double.toString(studentToBeUpdated.getExamGrade()));
 		
-	    String  redirectPath = "/courses/showStudentRegListOfCourse?courseId="+updtStud.getCourseId();
+	    String  redirectPath = "/courses/showStudentRegListOfCourse?courseId="+studentToBeUpdated.getCourseId();
 	    mockMvc.perform(post("/studentRegistrations/save").
 		params(multiValueMap)).
 		andExpect(status().isFound()).
 		andExpect(redirectedUrl(redirectPath)).
 		andReturn();	
 	    
-	    // perform a get request and check if the studentReg fields is updated 
-	    MvcResult result = mockMvc.perform(get("/courses/showStudentRegListOfCourse?courseId=MCK-000")).
-	    andExpect(status().isOk()).
-	    andExpect(view().name("/studentRegistration/list-studentRegistrations")).
-	    andReturn();
-	    
-	    @SuppressWarnings("unchecked")
-		List<StudentRegistration> studListFromModel = (List<StudentRegistration>) result.getModelAndView().getModel().get("studRegList");
-	    
-	    Assertions.assertEquals(1, studListFromModel.size());
-	    StudentRegistration updatedStud = studListFromModel.get(0);
-	    
-	    Assertions.assertEquals(updatedStud, updtStud);
+	    StudentRegistration expectedUpdatedStud = studentToBeUpdated;
+	    StudentRegistration actualUpdatedStud = studRegDao.findStudentRegistrationByStudentId(109);
+	    Assertions.assertEquals(expectedUpdatedStud, actualUpdatedStud);
 	    
 	    // restore db state as it was before running the test
-	    studRegDao.delete(updatedStud);
-	    StudentRegistration initialStudFromDb= new StudentRegistration (1, 100, "TestStudent", "SurrrnameA", 2020,"5","4","MCK-000", 7.0, 3.5);
-	    studRegDao.save(initialStudFromDb);
+	    studRegDao.delete(actualUpdatedStud);
+	    studRegDao.delete(studentFromDb);
 	}
 	
 	@Test 
