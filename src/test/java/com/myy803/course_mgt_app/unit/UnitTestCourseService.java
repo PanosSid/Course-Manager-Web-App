@@ -116,7 +116,6 @@ public class UnitTestCourseService  {
 		statCalculationStrategies.add(new VarianceStatisticStrategy());		
 		courseService.setStatCalculationStrategies(statCalculationStrategies);
 
-		
 		Map<String, List<Double>> resultMap = courseService.getCourseStatistics(studRegList);
 		Assertions.assertNotNull(resultMap);
 	}

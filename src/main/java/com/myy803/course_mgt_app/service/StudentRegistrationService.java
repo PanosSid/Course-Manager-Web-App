@@ -21,6 +21,6 @@ public interface StudentRegistrationService {
 
 	void deleteByStudentId(int id);
 
-	void saveStudRegFile(MultipartFile file) throws IOException;
+	void saveStudRegsFromFile(MultipartFile file) throws IOException;
 
 }

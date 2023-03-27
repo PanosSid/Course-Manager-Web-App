@@ -20,7 +20,7 @@ import com.myy803.course_mgt_app.model.StudentRegistration;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(locations = "classpath:application.properties")
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class IntegrationTestStudentRegDAO {
 
 	@Autowired 
@@ -29,12 +29,14 @@ public class IntegrationTestStudentRegDAO {
 	@Autowired
 	private TestEntityManager entityManager;
 	
-	private StudentRegistration testStudReg = new StudentRegistration(11, "StudTmp1", "StudSurname", 2000,"1","1","MCK-000", 1, 2);
+	private StudentRegistration testStudReg = new StudentRegistration(11, "StudTmp1", "StudSurname", 2000,"1","1","MCK-111", 1, 2);
 	
 	
 	@BeforeAll
 	static void setUpDBwithTestCourseForForeignKeyConstrain(@Autowired CourseDAO courseDao) {
-		courseDao.save(new Course("MCK-000", "instructor_tester2", "TmpCourse", "1st", 1, "..."));
+		if (courseDao.findCourseByCourseId("MCK-111") == null) {
+			courseDao.save(new Course("MCK-111", "instructor_tester2", "TmpCourse", "1st", 1, "..."));			
+		}
 	}
 	
 	@BeforeEach
@@ -52,10 +54,10 @@ public class IntegrationTestStudentRegDAO {
 	
 	@Test
 	void testfindStudentRegistrationByCourseId() {
-		StudentRegistration testStudReg2 = new StudentRegistration(22, "StudTmp2", "StudSurname2", 2000,"1","1","MCK-000", 1, 2);
+		StudentRegistration testStudReg2 = new StudentRegistration(22, "StudTmp2", "StudSurname2", 2000,"1","1","MCK-111", 1, 2);
 		entityManager.persist(testStudReg);
 		entityManager.persist(testStudReg2);
-		List<StudentRegistration> storedStudRegs = studRegDao.findStudentRegistrationsByCourseId("MCK-000");
+		List<StudentRegistration> storedStudRegs = studRegDao.findStudentRegistrationsByCourseId("MCK-111");
 		Assertions.assertEquals(testStudReg, storedStudRegs.get(0));
 		Assertions.assertEquals(testStudReg2, storedStudRegs.get(1));
 	}
@@ -77,7 +79,7 @@ public class IntegrationTestStudentRegDAO {
 	
 	@AfterAll
 	static void teadDownDBwithTestCourse(@Autowired CourseDAO courseDao) {
-		courseDao.delete(new Course("MCK-000", "instructor_tester2", "TmpCourse", "1st", 1, "..."));
+		courseDao.delete(courseDao.findCourseByCourseId("MCK-111"));
 	}
 
 }

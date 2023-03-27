@@ -17,7 +17,7 @@ import com.myy803.course_mgt_app.model.Course;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(locations = "classpath:application.properties")
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class IntegrationTestCourseDAO {
 
 	@Autowired 
@@ -26,7 +26,7 @@ public class IntegrationTestCourseDAO {
 	@Autowired
 	private TestEntityManager entityManager;
 	
-	private Course testCourse = new Course("TMP-123", "instructor_tester2", "TmpCourse", "1st", 1, "...");
+	private Course testCourse = new Course("TMP-123", "instructor_courseDao", "TmpCourse", "1st", 1, "...");
 	
 	@BeforeEach
 	void setUpDBWithTestCourse() {
@@ -47,15 +47,14 @@ public class IntegrationTestCourseDAO {
 	
 	@Test
 	void testFindCoursesByInstructorLogin() {
-		Course testCourse2 = new Course("MCK-000", "instructor_tester2", "MckCourse", "1st", 1, "...");
+		Course testCourse2 = new Course("MCK-100", "instructor_courseDao", "MckCourse", "1st", 1, "...");
 		entityManager.persist(testCourse2);
-		
+
 		List<Course> storedCourses = courseDao.findCoursesByInstructorLogin(testCourse.getInstructorLogin());
 		Assertions.assertNotNull(storedCourses);
 		Assertions.assertEquals(2, storedCourses.size());
 		Assertions.assertEquals(testCourse, storedCourses.get(0));
 		Assertions.assertEquals(testCourse2, storedCourses.get(1));
-		
 	}
 	
 	@Test
@@ -65,8 +64,8 @@ public class IntegrationTestCourseDAO {
 	}
 	
 	void testSaveAll() {
-		Course testCourse2 = new Course("MCK-000", "instructor_tester2", "MckCourse", "1st", 1, "...");
-		Course testCourse3 = new Course("MCK-333", "instructor_tester2", "MckCourse3", "1st", 1, "...");
+		Course testCourse2 = new Course("MCK-100", "instructor_courseDao", "MckCourse", "1st", 1, "...");
+		Course testCourse3 = new Course("MCK-333", "instructor_courseDao", "MckCourse3", "1st", 1, "...");
 		entityManager.persist(testCourse2);
 		entityManager.persist(testCourse3);
 		
@@ -87,6 +86,5 @@ public class IntegrationTestCourseDAO {
 		Course searchedCourse = courseDao.findCourseByCourseId("TMP-123");
 		Assertions.assertNull(searchedCourse);
 	}
-	
 	
 }

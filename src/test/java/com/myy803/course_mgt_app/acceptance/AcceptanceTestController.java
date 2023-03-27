@@ -19,9 +19,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestEntityManager;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -31,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.context.WebApplicationContext;
@@ -42,10 +40,9 @@ import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 
 @SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.properties")
-@AutoConfigureTestEntityManager
 @AutoConfigureMockMvc
+@Transactional
 public class AcceptanceTestController {
 	
 	@Autowired
@@ -63,9 +60,6 @@ public class AcceptanceTestController {
 	@Autowired
 	private CourseMgtAppController controller;
 	
-	@Autowired
-	private TestEntityManager entityManager;
-
 	private Course course = new Course("TTT-000", "instructor_tester", "CourseTest", "2nd", 1, "This is a dummy course used only for testing");
 	
 	private List<StudentRegistration> listStudRegs;
@@ -203,23 +197,9 @@ public class AcceptanceTestController {
 		params(multiValueMap)).
 		andExpect(status().isFound()).	
 		andExpect(redirectedUrl("/courses/list"));	
-		
-		// used to get the updated course 
-		MvcResult result2  = mockMvc.perform(get("/courses/list?instructorLogin=instructor_tester")).
-		andExpect(status().isOk()).
-		andExpect(model().attribute("instructorLogin", "instructor_tester2")).
-		andExpect(view().name("courses/list-courses")).
-		andReturn();
-		
-		@SuppressWarnings("unchecked")
-		List<Course> coursesList = (List<Course>) result2.getModelAndView().getModel().get("coursesList");
-		Assertions.assertEquals(coursesList.get(0), courseFromDb);	// check if the updated course from get request is the expected
-		
-		//restore course with typos for the next test run
-		Course initialCourseFromDb = new Course(courseFromForm.getDbKey(),"MCK-000", "instructor_tester2", "Tes5tCo(urse", "4", 2, "Used for testing (fix typos)");
-		courseDao.save(initialCourseFromDb);
-		
-		courseDao.delete(courseFromDb);
+			
+	    Course actualCourse= courseDao.findCourseByCourseId("MCK-111");
+	    Assertions.assertEquals(courseFromDb, actualCourse);
 		
 	}
 	
@@ -332,9 +312,6 @@ public class AcceptanceTestController {
 	    StudentRegistration actualUpdatedStud = studRegDao.findStudentRegistrationByStudentId(109);
 	    Assertions.assertEquals(expectedUpdatedStud, actualUpdatedStud);
 	    
-	    // restore db state as it was before running the test
-	    studRegDao.delete(actualUpdatedStud);
-	    studRegDao.delete(studentFromDb);
 	}
 	
 	@Test 
@@ -385,9 +362,9 @@ public class AcceptanceTestController {
 		double statProjectValues[] = {2.0, 10.0, 6.0, 4.0, 16.0, 0.0, 6.0};
 		double statExamValues[] = {1.5, 9.5, 5.0, 4.093, 16.75, 1.034, 4.0};
 		double statFinalValues[] = {2, 10, 5.667, 4.041, 16.333, 0.722, 5.0};
-		Map<String, Double> statProjectMap = setExpectedValuesToStatas(statProjectValues, statNames);
-		Map<String, Double> statExamMap = setExpectedValuesToStatas(statExamValues, statNames);
-		Map<String, Double> statFinalMap = setExpectedValuesToStatas(statFinalValues, statNames);
+		Map<String, Double> statProjectMap = setExpectedValuesToStats(statProjectValues, statNames);
+		Map<String, Double> statExamMap = setExpectedValuesToStats(statExamValues, statNames);
+		Map<String, Double> statFinalMap = setExpectedValuesToStats(statFinalValues, statNames);
 		
 		for (Entry<String, Double> set :  projectMap.entrySet()) {
 			String statName = set.getKey();
@@ -399,7 +376,7 @@ public class AcceptanceTestController {
 		}
 	}
 
-	private Map<String, Double> setExpectedValuesToStatas(double[] statProjectValues, String[] statNames) {
+	private Map<String, Double> setExpectedValuesToStats(double[] statProjectValues, String[] statNames) {
 		Map<String, Double> statMap = new HashMap<String, Double>();
 		for (int i = 0; i < statNames.length; i++) {
 			statMap.put(statNames[i], statProjectValues[i]);			
@@ -426,8 +403,6 @@ public class AcceptanceTestController {
 
         List<Course> actualCourses = courseDao.findCoursesByInstructorLogin("panos_tester");
         Assertions.assertEquals(expectedCourses, actualCourses);
-        courseDao.delete(actualCourses.get(0));
-        courseDao.delete(actualCourses.get(1));
 	}
 	
 	@Test
@@ -453,9 +428,6 @@ public class AcceptanceTestController {
 
         List<StudentRegistration> actualStudRegs = studRegDao.findStudentRegistrationsByCourseId("tst-007");
         Assertions.assertEquals(expectedStudRegs, actualStudRegs);
-        studRegDao.delete(actualStudRegs.get(0));
-        studRegDao.delete(actualStudRegs.get(1));
-        courseDao.delete(courseOfStudents);
 	}
 	
 	
