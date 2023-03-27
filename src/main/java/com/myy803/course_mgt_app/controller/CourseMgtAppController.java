@@ -1,11 +1,11 @@
 package com.myy803.course_mgt_app.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -181,20 +181,15 @@ public class CourseMgtAppController {
 	}
 
 	@PostMapping("/upload")
-	public String uploadCourseFile(@RequestParam("file") MultipartFile file) {
-		String instructorLogin = getAuthenticatedInstuctorLogin();
-		if ("text/csv".equals(file.getContentType())) { // check if file has csv format
-			courseService.saveCoursesFromFile(file, instructorLogin);
-		}
+	public String uploadCourseFile(@RequestParam("file") MultipartFile file) throws IOException {
+		courseService.saveCoursesFromFile(file);
 		return "redirect:/courses/list";
 	}
 
 	@PostMapping("/studentReg/upload")
 	public String uploadStudentRegFile(@RequestParam("file") MultipartFile file,
-			@RequestParam("courseId") String courseId) {
-		if ("text/csv".equals(file.getContentType())) {
-			studentRegService.saveStudRegFile(file, courseId);
-		}
+			@RequestParam("courseId") String courseId) throws IOException {
+		studentRegService.saveStudRegFile(file);
 		return "redirect:/courses/showStudentRegListOfCourse?courseId=" + courseId;
 	}
 

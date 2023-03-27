@@ -1,5 +1,6 @@
 package com.myy803.course_mgt_app.service;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -20,6 +21,6 @@ public interface StudentRegistrationService {
 
 	void deleteByStudentId(int id);
 
-	void saveStudRegFile(MultipartFile file, String courseId);
+	void saveStudRegFile(MultipartFile file) throws IOException;
 
 }
