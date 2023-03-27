@@ -1,8 +1,10 @@
 package com.myy803.course_mgt_app.unit;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,13 +12,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.CourseServiceImp;
+import com.myy803.course_mgt_app.service.importers.CourseImporter;
 import com.myy803.course_mgt_app.service.statistics.MaxStatisticStrategy;
+import com.myy803.course_mgt_app.service.statistics.MeanStatisticStrategy;
 import com.myy803.course_mgt_app.service.statistics.MinStatisticStrategy;
+import com.myy803.course_mgt_app.service.statistics.PercentileStatisticStrategy;
+import com.myy803.course_mgt_app.service.statistics.SkewnessStatisticStrategy;
+import com.myy803.course_mgt_app.service.statistics.StandardDeviationStatisticStrategy;
 import com.myy803.course_mgt_app.service.statistics.StatisticStrategy;
+import com.myy803.course_mgt_app.service.statistics.VarianceStatisticStrategy;
 
 @ExtendWith(MockitoExtension.class)
 public class UnitTestCourseService  {
@@ -26,6 +37,9 @@ public class UnitTestCourseService  {
 	
 	@Mock
 	private CourseDAO courseDAO;
+	
+	@Mock
+    private CourseImporter courseImporter;
 	
 	private Course testCourse = new Course(100,"TMP-123", "instructor_tester", "TmpCourse", "1st", 1, "...");
 	
@@ -54,12 +68,11 @@ public class UnitTestCourseService  {
 		Mockito.when(courseDAO.findCoursesByInstructorLogin("instructor_tester1")).thenReturn(mockedList);
 		
 		List<Course> storedCourses =  courseService.findCoursesByInstructorLogin("instructor_tester1");
-		Assertions.assertNotNull(storedCourses);
+		
 		Assertions.assertEquals(3, storedCourses.size());
-		for (int i = 0; i < mockedList.size(); i++) {
-			Assertions.assertEquals(mockedList.get(i), storedCourses.get(i));
-		}
-	
+		Assertions.assertEquals(mockedList.get(0), storedCourses.get(0));
+		Assertions.assertEquals(mockedList.get(1), storedCourses.get(1));
+		Assertions.assertEquals(mockedList.get(2), storedCourses.get(2));	
 	}
 	
 	@Test
@@ -96,6 +109,11 @@ public class UnitTestCourseService  {
 		List<StatisticStrategy> statCalculationStrategies = new ArrayList<StatisticStrategy>();
 		statCalculationStrategies.add(new MinStatisticStrategy());
 		statCalculationStrategies.add(new MaxStatisticStrategy());		
+		statCalculationStrategies.add(new MeanStatisticStrategy());		
+		statCalculationStrategies.add(new PercentileStatisticStrategy());		
+		statCalculationStrategies.add(new SkewnessStatisticStrategy());		
+		statCalculationStrategies.add(new StandardDeviationStatisticStrategy());		
+		statCalculationStrategies.add(new VarianceStatisticStrategy());		
 		courseService.setStatCalculationStrategies(statCalculationStrategies);
 
 		
@@ -103,6 +121,22 @@ public class UnitTestCourseService  {
 		Assertions.assertNotNull(resultMap);
 	}
 	
-	//TODO add test for saveCoursesFromFile()
+	@Test 
+	void testSaveCoursesFromFile() throws IOException {
+		String fileContents = "Id,Name,InstructorLogin, Semester,Year,Syllabus\n"
+				+ "MYY-301,Software Development I, pvassil, 1,3, Software development basics\n"
+				+ "PLH-010,Advanced Databases,pvassil,2,4,Advanced DB and more\n";
+		
+		MultipartFile file =  new MockMultipartFile("courses_upload", "courses_upload.csv", "text/csv", fileContents.getBytes());
+		List<Course> courses = new ArrayList<>();
+        courses.add(new Course("MYY-301", "pvassil", "Software Development I", "1", 3, "Software development basics"));
+        courses.add(new Course("PLH-010", "pvassil", "Advanced Databases", "2", 4, "Advanced DB and more"));
+        Mockito.when(courseImporter.getCoursesFromFile(file)).thenReturn(courses);
+       
+        courseService.saveCoursesFromFile(file);
+
+        Mockito.verify(courseImporter).getCoursesFromFile(file);        
+        Mockito.verify(courseDAO).saveAll(courses);
+	}
 	
 }

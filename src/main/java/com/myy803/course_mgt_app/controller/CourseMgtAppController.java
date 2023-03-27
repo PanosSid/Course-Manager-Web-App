@@ -180,7 +180,7 @@ public class CourseMgtAppController {
 		return "/studentRegistration/studentReg-form";
 	}
 
-	@PostMapping("/upload")
+	@PostMapping("/courses/upload")
 	public String uploadCourseFile(@RequestParam("file") MultipartFile file) throws IOException {
 		courseService.saveCoursesFromFile(file);
 		return "redirect:/courses/list";
@@ -189,7 +189,7 @@ public class CourseMgtAppController {
 	@PostMapping("/studentReg/upload")
 	public String uploadStudentRegFile(@RequestParam("file") MultipartFile file,
 			@RequestParam("courseId") String courseId) throws IOException {
-		studentRegService.saveStudRegFile(file);
+		studentRegService.saveStudRegsFromFile(file);
 		return "redirect:/courses/showStudentRegListOfCourse?courseId=" + courseId;
 	}
 

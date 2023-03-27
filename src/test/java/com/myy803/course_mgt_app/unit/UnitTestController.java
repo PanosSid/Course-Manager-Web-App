@@ -1,5 +1,6 @@
 package com.myy803.course_mgt_app.unit;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -187,21 +188,19 @@ public class UnitTestController {
 	}
 	
 	@Test 
-	void testUploadCourseFile() {
+	void testUploadCourseFile() throws IOException {
 		MultipartFile fileMock = Mockito.mock(MultipartFile.class);
-		Mockito.when(fileMock.getContentType()).thenReturn("text/csv");
 		String redirectedView = controller.uploadCourseFile(fileMock);
 		Assertions.assertEquals("redirect:/courses/list", redirectedView);
-		Mockito.verify(courseService, Mockito.times(1)).saveCoursesFromFile(fileMock, INSTRUCTOR_LOGIN);
+		Mockito.verify(courseService, Mockito.times(1)).saveCoursesFromFile(fileMock);
 	}
 	
 	@Test 
-	void testUploadStudentRegFile() {
+	void testUploadStudentRegFile() throws IOException {
 		MultipartFile fileMock = Mockito.mock(MultipartFile.class);
-		Mockito.when(fileMock.getContentType()).thenReturn("text/csv");
 		String redirectedView = controller.uploadStudentRegFile(fileMock, "MCK-000");
 		Assertions.assertEquals("redirect:/courses/showStudentRegListOfCourse?courseId=MCK-000", redirectedView);
-		Mockito.verify(studRegService, Mockito.times(1)).saveStudRegFile(fileMock, "MCK-000");
+		Mockito.verify(studRegService, Mockito.times(1)).saveStudRegsFromFile(fileMock);
 	}
 
 }

@@ -14,17 +14,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.persistence.EntityManager;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -57,7 +62,8 @@ public class AcceptanceTestController {
 	@Autowired
 	private CourseMgtAppController controller;
 	
-	private Course course ;
+
+	private Course course;
 	
 	private List<StudentRegistration> listStudRegs;
 
@@ -398,13 +404,65 @@ public class AcceptanceTestController {
 		}
 	}
 
-	public Map<String, Double> setExpectedValuesToStatas(double[] statProjectValues, String[] statNames) {
+	private Map<String, Double> setExpectedValuesToStatas(double[] statProjectValues, String[] statNames) {
 		Map<String, Double> statMap = new HashMap<String, Double>();
 		for (int i = 0; i < statNames.length; i++) {
 			statMap.put(statNames[i], statProjectValues[i]);			
 		}
 		return statMap;
 	}
+	
+	@Test
+	void testUploadCourseFile() throws Exception {
+		String fileContents = "Id,Name,InstructorLogin, Semester,Year,Syllabus\n"
+				+ "tst-001,Software Development I, panos_tester, 1,3, Software development basics\n"
+				+ "tst-002,Advanced Databases,panos_tester,2,4,Advanced DB and more\n";
+		
+		MockMultipartFile file =  new MockMultipartFile("file", "tst_panos_courses.csv", "text/csv", fileContents.getBytes());
+		       
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/courses/upload")
+                .file(file))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/courses/list"));
+
+        List<Course> expectedCourses = new ArrayList<>();
+        expectedCourses.add(new Course("tst-001", "panos_tester", "Software Development I", "1", 3, "Software development basics"));
+        expectedCourses.add(new Course("tst-002", "panos_tester", "Advanced Databases", "2", 4, "Advanced DB and more"));
+
+        List<Course> actualCourses = courseDao.findCoursesByInstructorLogin("panos_tester");
+        Assertions.assertEquals(expectedCourses, actualCourses);
+        courseDao.delete(actualCourses.get(0));
+        courseDao.delete(actualCourses.get(1));
+	}
+	
+	@Test
+	void testUploadStudentRegsFile() throws Exception {
+		Course courseOfStudents = new Course("tst-007", "panos_tester2", "softdev", "1", 3, "Software development basics");
+		courseDao.save(courseOfStudents);
+		
+		String fileContents = "AM,First Name,Last Name,Year of Registration,Year of Studies,Semester,Course Id,Project Grade,Exam Grade\r\n"
+				+ "330,Name3,LName3, 2017, 3,5,tst-007,2.5,3.5\r\n"
+				+ "440,Name4,LName4, 1995, 5,10,tst-007,8.5,6.5";
+		
+		MockMultipartFile file =  new MockMultipartFile("file", "tst_myy301_students.csv", "text/csv", fileContents.getBytes());
+		       
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/studentReg/upload")
+                .file(file)
+                .param("courseId", "tst-007"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/courses/showStudentRegListOfCourse?courseId=tst-007"));
+
+        List<StudentRegistration> expectedStudRegs = new ArrayList<StudentRegistration>();
+        expectedStudRegs.add(new StudentRegistration(330, "Name3", "LName3", 2017, "3", "5", "tst-007", 2.5, 3.5));
+        expectedStudRegs.add(new StudentRegistration(440, "Name4", "LName4", 1995, "5", "10", "tst-007", 8.5, 6.5));
+
+        List<StudentRegistration> actualStudRegs = studRegDao.findStudentRegistrationsByCourseId("tst-007");
+        Assertions.assertEquals(expectedStudRegs, actualStudRegs);
+        studRegDao.delete(actualStudRegs.get(0));
+        studRegDao.delete(actualStudRegs.get(1));
+        courseDao.delete(courseOfStudents);
+	}
+	
 	
 	@AfterEach
 	void restoreDbFromChanges() {
@@ -414,13 +472,16 @@ public class AcceptanceTestController {
 				courseDao.delete(c);
 			}			
 		}
+		courseDao.deleteAll(courseDao.findCoursesByInstructorLogin("panos_tester2"));
 		
-		List<StudentRegistration> listStudReg = studRegDao.findStudentRegistrationByCourseId("TTT-000");
+		List<StudentRegistration> listStudReg = studRegDao.findStudentRegistrationsByCourseId("TTT-000");
 		if (listStudReg.size() > 0) {
 			for (StudentRegistration s : listStudReg) {
 				studRegDao.delete(s);
 			}			
 		}
+		
+		
 		
 	}
 	
