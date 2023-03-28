@@ -27,7 +27,7 @@ public class CSVLoader implements FileLoader {
 		return csvRecords;
 	}
 	
-	public List<List<String>> convertRecordsToDataList(List<CSVRecord> csvRecords) {
+	private List<List<String>> convertRecordsToDataList(List<CSVRecord> csvRecords) {
 		List<List<String>> outerlist = new ArrayList<>();
 		for (CSVRecord csvRecord : csvRecords) {
 			List<String> innerList = new ArrayList<String>();

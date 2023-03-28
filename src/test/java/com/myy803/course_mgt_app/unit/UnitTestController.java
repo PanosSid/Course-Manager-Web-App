@@ -112,7 +112,7 @@ public class UnitTestController {
 		minGradeStats.add(3.0);
 		statsMap.put("Min", minGradeStats);
 
-		Mockito.when(courseService.getCourseStatistics(studRegList)).thenReturn(statsMap);
+		Mockito.when(courseService.getCourseStatistics("MCK-000")).thenReturn(statsMap);
 
 		String actualCourseStatsPath = controller.showStatisticsOfCourse("MCK-000", model);
 		Assertions.assertEquals("/courses/course-statistics", actualCourseStatsPath);

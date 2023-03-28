@@ -1,7 +1,6 @@
 package com.myy803.course_mgt_app.service;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -13,8 +12,7 @@ import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.importers.CourseImporter;
-import com.myy803.course_mgt_app.service.statistics.StatisticStrategy;
-import com.myy803.course_mgt_app.service.statistics.TemplateStatisticStrategy;
+import com.myy803.course_mgt_app.service.statistics.CourseStatisticsService;
 
 @Service
 public class CourseServiceImp implements CourseService {
@@ -22,19 +20,18 @@ public class CourseServiceImp implements CourseService {
 	@Autowired
 	private CourseDAO courseDao;
 	
-	private CourseImporter courseImporter;
+	@Autowired
+	private StudentRegistrationService studRegService;
 	
 	@Autowired
-	private List<StatisticStrategy> statCalculationStrategies;
-
+	private CourseStatisticsService statsService;
+	
+	private CourseImporter courseImporter;
+		
 	public CourseServiceImp() {
 		courseImporter = new CourseImporter();
 	}
 	
-	public void setStatCalculationStrategies(List<StatisticStrategy> statCalculationStrategies) {
-		this.statCalculationStrategies = statCalculationStrategies;
-	}
-
 	@Override
 	public Course findCourseByCourseId(String theId) {
 		return courseDao.findCourseByCourseId(theId);
@@ -62,14 +59,17 @@ public class CourseServiceImp implements CourseService {
 	}
 
 	@Override
-	public Map<String, List<Double>> getCourseStatistics(List<StudentRegistration> studRegs) {
-		Map<String, List<Double>> mapCalcs = new HashMap<String, List<Double>>();
-		for (StatisticStrategy statStrat : statCalculationStrategies) {
-			String stratName = ((TemplateStatisticStrategy) statStrat).getStatisticName();
-			List<Double> gradesStats = statStrat.calculateStatistcs(studRegs);
-			mapCalcs.put(stratName, gradesStats);
-		}
-		return mapCalcs;
+	public Map<String, List<Double>> getCourseStatistics(String courseId) {
+		List<StudentRegistration> studRegs = studRegService.findStudentRegistrationsByCourseId(courseId);
+		return statsService.getGradeStatisticsOfStudents(studRegs);
+		
+//		Map<String, List<Double>> mapCalcs = new HashMap<String, List<Double>>();
+//		for (StatisticStrategy statStrat : statCalculationStrategies) {
+//			String stratName = ((TemplateStatisticStrategy) statStrat).getStatisticName();
+//			List<Double> gradesStats = statStrat.calculateStatistcs(studRegs);
+//			mapCalcs.put(stratName, gradesStats);
+//		}
+//		return mapCalcs;
 	}
 	
 	@Override

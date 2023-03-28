@@ -81,9 +81,7 @@ public class CourseMgtAppController {
 	@RequestMapping("/courses/showStatisticsOfCourse")
 	public String showStatisticsOfCourse(@RequestParam("courseId") String courseId, Model model) {
 		setStatistcsPageTile(courseId, model);
-		Map<String, List<Double>> statsMap = courseService
-				.getCourseStatistics(studentRegService.findStudentRegistrationsByCourseId(courseId));
-
+		Map<String, List<Double>> statsMap = courseService.getCourseStatistics(courseId);
 		setStatsToModel(model, statsMap);
 		return "/courses/course-statistics";
 	}

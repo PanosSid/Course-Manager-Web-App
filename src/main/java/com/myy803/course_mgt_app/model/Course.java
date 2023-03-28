@@ -141,7 +141,7 @@ public class Course {
 		this.syllabus = syllabus;
 	}
 
-	public List<StudentRegistration> getStudentReg() {
+	public List<StudentRegistration> getStudentRegs() {
 		return studentReg;
 	}
 

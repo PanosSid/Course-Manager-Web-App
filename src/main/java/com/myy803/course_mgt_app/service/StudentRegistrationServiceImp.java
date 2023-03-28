@@ -13,14 +13,14 @@ import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.importers.StudentRegistrationImporter;
 
 @Service
-public class StudentRegistrationServiceImpl implements StudentRegistrationService {
+public class StudentRegistrationServiceImp implements StudentRegistrationService {
 
 	@Autowired
 	private StudentRegistrationDAO studentRegDao;
 	
 	private StudentRegistrationImporter studRegImporter = new StudentRegistrationImporter();
 
-	public StudentRegistrationServiceImpl() {
+	public StudentRegistrationServiceImp() {
 	}
 
 	@Override

@@ -13,7 +13,7 @@ import com.myy803.course_mgt_app.model.StudentRegistration;
 
 
 @Component
-public abstract class TemplateStatisticStrategy implements StatisticStrategy{
+public abstract class TemplateStatisticStrategy implements StatisticStrategy {
 	
 	protected String statisticName; 
 	
@@ -35,7 +35,6 @@ public abstract class TemplateStatisticStrategy implements StatisticStrategy{
 	abstract public double doActualCalculation(DescriptiveStatistics ds);
 	
 	private Map<String, DescriptiveStatistics> prepareDataSet(List<StudentRegistration> studRegs) {
-//		ArrayList<DescriptiveStatistics> dsList = new ArrayList<DescriptiveStatistics>();
 		Map<String, DescriptiveStatistics> dsMap = new HashMap<String, DescriptiveStatistics>();
 		
 		DescriptiveStatistics projectDs = new DescriptiveStatistics();
@@ -44,7 +43,7 @@ public abstract class TemplateStatisticStrategy implements StatisticStrategy{
 		
 		for (StudentRegistration student : studRegs) {
 			double projectGrade = student.getProjectGrade();
-			double examGrade = student.getExamGrade();	/// edo prosoxi analoga me to ti ipologizoume
+			double examGrade = student.getExamGrade();	
 			double finalGrade = student.getFinalGrade();
 
 			projectDs.addValue(projectGrade);
@@ -56,20 +55,15 @@ public abstract class TemplateStatisticStrategy implements StatisticStrategy{
 		dsMap.put("exam", examDs);
 		dsMap.put("final", finalDs);
 		
-//		dsList.add(projectDs);
-//		dsList.add(examDs);
-//		dsList.add(finalDs);
-//		
-//		return  dsList;
 		return dsMap;
 	}
 	
 	@Override
 	public List<Double> calculateStatistcs(List<StudentRegistration> studRegs) {
 		Map<String, DescriptiveStatistics> dsMap =  prepareDataSet(studRegs);
-		double projectStat = doActualCalculation(dsMap.get("project"));	// calculate stat for project grade
-		double examStat = doActualCalculation(dsMap.get("exam"));	// calculate stat for exam grade
-		double finalStat = doActualCalculation(dsMap.get("final"));	// calculate stat for final grade
+		double projectStat = doActualCalculation(dsMap.get("project"));	
+		double examStat = doActualCalculation(dsMap.get("exam"));	
+		double finalStat = doActualCalculation(dsMap.get("final"));	
 
 		projectStat = Precision.round(projectStat, 3);
 		examStat = Precision.round(examStat, 3);

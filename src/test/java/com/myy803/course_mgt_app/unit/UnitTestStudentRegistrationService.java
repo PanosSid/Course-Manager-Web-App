@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.myy803.course_mgt_app.dao.StudentRegistrationDAO;
 import com.myy803.course_mgt_app.model.StudentRegistration;
-import com.myy803.course_mgt_app.service.StudentRegistrationServiceImpl;
+import com.myy803.course_mgt_app.service.StudentRegistrationServiceImp;
 import com.myy803.course_mgt_app.service.importers.StudentRegistrationImporter;
 
 
@@ -24,7 +24,7 @@ import com.myy803.course_mgt_app.service.importers.StudentRegistrationImporter;
 public class UnitTestStudentRegistrationService {
 		
 	@InjectMocks 
-	private StudentRegistrationServiceImpl studRegService;
+	private StudentRegistrationServiceImp studRegService;
 	
 	@Mock
 	private StudentRegistrationDAO studRegDAO;

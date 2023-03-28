@@ -5,6 +5,6 @@ import com.myy803.course_mgt_app.model.StudentRegistration;
 
 public interface StatisticStrategy {
 
-	List<Double> calculateStatistcs(List<StudentRegistration> studReg_list);
+	List<Double> calculateStatistcs(List<StudentRegistration> studRegs);
 
 }

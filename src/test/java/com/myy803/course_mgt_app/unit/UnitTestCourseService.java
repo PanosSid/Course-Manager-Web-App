@@ -2,6 +2,7 @@ package com.myy803.course_mgt_app.unit;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,15 +20,9 @@ import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.CourseServiceImp;
+import com.myy803.course_mgt_app.service.StudentRegistrationService;
 import com.myy803.course_mgt_app.service.importers.CourseImporter;
-import com.myy803.course_mgt_app.service.statistics.MaxStatisticStrategy;
-import com.myy803.course_mgt_app.service.statistics.MeanStatisticStrategy;
-import com.myy803.course_mgt_app.service.statistics.MinStatisticStrategy;
-import com.myy803.course_mgt_app.service.statistics.PercentileStatisticStrategy;
-import com.myy803.course_mgt_app.service.statistics.SkewnessStatisticStrategy;
-import com.myy803.course_mgt_app.service.statistics.StandardDeviationStatisticStrategy;
-import com.myy803.course_mgt_app.service.statistics.StatisticStrategy;
-import com.myy803.course_mgt_app.service.statistics.VarianceStatisticStrategy;
+import com.myy803.course_mgt_app.service.statistics.CourseStatisticServiceImp;
 
 @ExtendWith(MockitoExtension.class)
 public class UnitTestCourseService  {
@@ -40,6 +35,12 @@ public class UnitTestCourseService  {
 	
 	@Mock
     private CourseImporter courseImporter;
+	
+	@Mock
+	private StudentRegistrationService studRegService;
+	
+	@Mock
+	private CourseStatisticServiceImp statsCalculator;
 	
 	private Course testCourse = new Course(100,"TMP-123", "instructor_tester", "TmpCourse", "1st", 1, "...");
 	
@@ -100,24 +101,34 @@ public class UnitTestCourseService  {
 	}
 	
 	@Test
-	void testGetCourseStatisticsReturnsNotNullMap() {
+	void testGetCourseStatisticsReturnsNotNullMap() {		
 		List<StudentRegistration> studRegList = new ArrayList<StudentRegistration>();
 		studRegList.add(new StudentRegistration (11, "TopStud", "StudSurnam1e", 2018,"4th","8th","TTT-000", 10, 9.5));
 		studRegList.add(new StudentRegistration (22, "AverageStud", "StudSurname2", 2017,"5th","9th","TTT-000", 6, 4));
 		studRegList.add(new StudentRegistration (33, "BadStud", "StudSurname3", 2013,"5th","10th","TTT-000", 2, 1.5));
 
-		List<StatisticStrategy> statCalculationStrategies = new ArrayList<StatisticStrategy>();
-		statCalculationStrategies.add(new MinStatisticStrategy());
-		statCalculationStrategies.add(new MaxStatisticStrategy());		
-		statCalculationStrategies.add(new MeanStatisticStrategy());		
-		statCalculationStrategies.add(new PercentileStatisticStrategy());		
-		statCalculationStrategies.add(new SkewnessStatisticStrategy());		
-		statCalculationStrategies.add(new StandardDeviationStatisticStrategy());		
-		statCalculationStrategies.add(new VarianceStatisticStrategy());		
-		courseService.setStatCalculationStrategies(statCalculationStrategies);
-
-		Map<String, List<Double>> resultMap = courseService.getCourseStatistics(studRegList);
-		Assertions.assertNotNull(resultMap);
+		Map<String, List<Double>> expectedStatsMap = new HashMap<>();
+		expectedStatsMap.put("Min", convertToList(2.0, 1.5, 2));
+		expectedStatsMap.put("Max", convertToList(10.0, 9.5, 10));
+		expectedStatsMap.put("Mean", convertToList(6, 5.0, 5.667));
+		expectedStatsMap.put("StandardDeviation", convertToList(4, 4.093, 4.041));
+		expectedStatsMap.put("Variance", convertToList(16.0, 16.75, 16.333));
+		expectedStatsMap.put("Skewness", convertToList(0.0, 1.034, 0.722));
+		expectedStatsMap.put("Percentile", convertToList(6.0, 4.0, 5.0));
+		
+		Mockito.when(studRegService.findStudentRegistrationsByCourseId("TTT-000")).thenReturn(studRegList);
+		Mockito.when(statsCalculator.getGradeStatisticsOfStudents(studRegList)).thenReturn(expectedStatsMap);
+		Map<String, List<Double>> actualStatsMap = courseService.getCourseStatistics("TTT-000");
+		
+		Assertions.assertEquals(expectedStatsMap, actualStatsMap);
+		Mockito.verify(studRegService).findStudentRegistrationsByCourseId("TTT-000");
+		Mockito.verify(statsCalculator).getGradeStatisticsOfStudents(studRegList);
+	}
+	
+	private List<Double> convertToList(double proj, double exam, double f) {
+		List<Double> l = new ArrayList<Double>();
+		l.add(proj); l.add(exam); l.add(f);
+		return l;
 	}
 	
 	@Test 

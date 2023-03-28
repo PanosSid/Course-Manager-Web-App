@@ -18,6 +18,8 @@ import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.CourseService;
+import com.myy803.course_mgt_app.service.StudentRegistrationService;
+import com.myy803.course_mgt_app.service.statistics.CourseStatisticServiceImp;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -29,6 +31,13 @@ public class IntegrationTestCourseService {
 	
 	@Autowired
 	private CourseDAO courseDao;
+	
+	@Autowired
+	private StudentRegistrationService studRegService;
+	
+	@Autowired
+	private CourseStatisticServiceImp statsService;
+	
 	
 	private Course testCourse = new Course("TMP-123", "instructor_tester", "TmpCourse", "1st", 1, "...");
 	
@@ -81,11 +90,11 @@ public class IntegrationTestCourseService {
 	
 	@Test
 	void testGetCourseStatistics() {
-		List<StudentRegistration> studRegs = new ArrayList<StudentRegistration>();
-		studRegs.add(new StudentRegistration (11, "TopStud", "StudSurnam1e", 2018,"4th","8th","TTT-000", 10, 9.5));
-		studRegs.add(new StudentRegistration (22, "AverageStud", "StudSurname2", 2017,"5th","9th","TTT-000", 6, 4));
-		studRegs.add(new StudentRegistration (33, "BadStud", "StudSurname3", 2013,"5th","10th","TTT-000", 2, 1.5));
-		
+		courseService.save(new Course("TTT-000", "instructor_tester", "TmpCourse", "1st", 1, "..."));
+		studRegService.save(new StudentRegistration (11, "TopStud", "StudSurnam1e", 2018,"4th","8th","TTT-000", 10, 9.5));
+		studRegService.save(new StudentRegistration (22, "AverageStud", "StudSurname2", 2017,"5th","9th","TTT-000", 6, 4));
+		studRegService.save(new StudentRegistration (33, "BadStud", "StudSurname3", 2013,"5th","10th","TTT-000", 2, 1.5));
+
 		Map<String, List<Double>> expectedStatsMap = new HashMap<>();
 		expectedStatsMap.put("Min", convertToList(2.0, 1.5, 2));
 		expectedStatsMap.put("Max", convertToList(10.0, 9.5, 10));
@@ -95,7 +104,7 @@ public class IntegrationTestCourseService {
 		expectedStatsMap.put("Skewness", convertToList(0.0, 1.034, 0.722));
 		expectedStatsMap.put("Percentile", convertToList(6.0, 4.0, 5.0));
 		
-		Map<String, List<Double>> actualStatsMap = courseService.getCourseStatistics(studRegs);
+		Map<String, List<Double>> actualStatsMap = courseService.getCourseStatistics("TTT-000");
 		for (String key : expectedStatsMap.keySet()) {
 		    Assertions.assertEquals(expectedStatsMap.get(key), actualStatsMap.get(key));
 		}
