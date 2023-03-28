@@ -22,7 +22,7 @@ import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.CourseServiceImp;
 import com.myy803.course_mgt_app.service.StudentRegistrationService;
 import com.myy803.course_mgt_app.service.importers.CourseImporter;
-import com.myy803.course_mgt_app.service.statistics.CourseStatisticServiceImp;
+import com.myy803.course_mgt_app.service.statistics.CourseStatisticsServiceImp;
 
 @ExtendWith(MockitoExtension.class)
 public class UnitTestCourseService  {
@@ -40,7 +40,7 @@ public class UnitTestCourseService  {
 	private StudentRegistrationService studRegService;
 	
 	@Mock
-	private CourseStatisticServiceImp statsCalculator;
+	private CourseStatisticsServiceImp statsCalculator;
 	
 	private Course testCourse = new Course(100,"TMP-123", "instructor_tester", "TmpCourse", "1st", 1, "...");
 	

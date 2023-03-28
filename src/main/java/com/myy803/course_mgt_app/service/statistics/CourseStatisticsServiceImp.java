@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 
 @Service
-public class CourseStatisticServiceImp implements CourseStatisticsService {
+public class CourseStatisticsServiceImp implements CourseStatisticsService {
 	@Autowired
 	private List<StatisticStrategy> statCalculationStrategies;
 	

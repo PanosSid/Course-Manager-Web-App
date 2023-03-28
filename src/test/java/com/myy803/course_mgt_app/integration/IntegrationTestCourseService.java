@@ -19,7 +19,7 @@ import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.CourseService;
 import com.myy803.course_mgt_app.service.StudentRegistrationService;
-import com.myy803.course_mgt_app.service.statistics.CourseStatisticServiceImp;
+import com.myy803.course_mgt_app.service.statistics.CourseStatisticsServiceImp;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -36,7 +36,7 @@ public class IntegrationTestCourseService {
 	private StudentRegistrationService studRegService;
 	
 	@Autowired
-	private CourseStatisticServiceImp statsService;
+	private CourseStatisticsServiceImp statsService;
 	
 	
 	private Course testCourse = new Course("TMP-123", "instructor_tester", "TmpCourse", "1st", 1, "...");
