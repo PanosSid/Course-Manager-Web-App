@@ -89,7 +89,7 @@
 	
 	<hr>
 	
-	<form method="POST" th:action="@{/upload}" enctype="multipart/form-data">
+	<form method="POST" th:action="@{/courses/upload}" enctype="multipart/form-data">
      
     <div class="form-group mt-3" onclick="if (!(confirm('The first line of the csv file must be: Id,Name,Semester,Year,Syllabus'))) return false">
         <label for="file">Select a CSV file</label>

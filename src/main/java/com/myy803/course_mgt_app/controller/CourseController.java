@@ -4,32 +4,33 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.myy803.course_mgt_app.model.Course;
-import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.CourseService;
-import com.myy803.course_mgt_app.service.StudentRegistrationService;
 
 @Controller
-public class CourseMgtAppController {
+@RequestMapping("/courses")
+public class CourseController {
 
 	@Autowired
 	private CourseService courseService;
-
-	@Autowired
-	private StudentRegistrationService studentRegService;
 	
-	@RequestMapping("/courses/list")
+	@GetMapping("/list")
 	public String showCoursesList(Model model) {
 		String insturctorLoginField = getAuthenticatedInstuctorLogin();
 		List<Course> coursesList = courseService.findCoursesByInstructorLogin(insturctorLoginField);
@@ -42,21 +43,15 @@ public class CourseMgtAppController {
 		return SecurityContextHolder.getContext().getAuthentication().getName();
 	}
 
-	@RequestMapping("/courses/deleteCourse")
-	public String deleteCourse(@RequestParam("courseId") String courseId) {
-		courseService.deleteByCourseId(courseId);
-		return "redirect:/courses/list";
-	}
-
-	@RequestMapping("/courses/showFormForAddCourse")
+	@GetMapping("/showFormForAddCourse")
 	public String showFormForAddCourse(Model model, @RequestParam("instructorLogin") String instructorLogin) {
 		Course course = new Course();
 		model.addAttribute("course", course);
 		model.addAttribute("instructorLogin", instructorLogin);
 		return "courses/course-form";
 	}
-
-	@RequestMapping("/courses/showFormForUpdateCourse")
+	
+	@GetMapping("/showFormForUpdateCourse")
 	public String showFormForUpdateCourse(@RequestParam("courseId") String courseId, Model model) {
 		Course course = courseService.findCourseByCourseId(courseId);
 		model.addAttribute("course", course);
@@ -64,8 +59,8 @@ public class CourseMgtAppController {
 		model.addAttribute("instructorLogin", instructorLogin);
 		return "courses/course-form";
 	}
-
-	@RequestMapping("/courses/save")
+	
+	@PostMapping("/save")
 	public String saveCourse(@Valid @ModelAttribute(value = "course") Course course, BindingResult result,
 			Model model) {
 		if (result.hasErrors()) {
@@ -77,8 +72,15 @@ public class CourseMgtAppController {
 		courseService.save(course);
 		return "redirect:/courses/list";
 	}
+	
+	@RequestMapping("/deleteCourse")
+	public String deleteCourse(@RequestParam("courseId") String courseId) {
+		courseService.deleteByCourseId(courseId);
+		return "redirect:/courses/list";
+	}
 
-	@RequestMapping("/courses/showStatisticsOfCourse")
+
+	@GetMapping("/showStatisticsOfCourse")
 	public String showStatisticsOfCourse(@RequestParam("courseId") String courseId, Model model) {
 		setStatistcsPageTile(courseId, model);
 		Map<String, List<Double>> statsMap = courseService.getCourseStatistics(courseId);
@@ -121,70 +123,16 @@ public class CourseMgtAppController {
 		return course.getCourseId() + " " + course.getName();
 	}
 
-	@RequestMapping("/courses/showStudentRegListOfCourse")
-	public String showStudentRegListOfCourse(@RequestParam("courseId") String courseId, Model model) {
-		Course theCourse = courseService.findCourseByCourseId(courseId);
-		model.addAttribute("studRegTitle", getStudentRegPageTitle(theCourse));
-		model.addAttribute("courseId", courseId);
-		model.addAttribute("studRegList", studentRegService
-				.findStudentRegistrationsByCourseId(courseId));
-		return "/studentRegistration/list-studentRegistrations";
+	@GetMapping("/showStudentRegListOfCourse")
+	public String showStudentRegListOfCourse(@RequestParam("courseId") String courseId, RedirectAttributes redirectAttributes) {
+		Course course = courseService.findCourseByCourseId(courseId);
+		redirectAttributes.addFlashAttribute("studRegTitle", getStudentRegPageTitle(course));
+		return "redirect:/studentRegistrations?courseId=" + courseId;
 	}
-
-	@RequestMapping("/studentRegistrations/deleteStudentReg")
-	public String deleteStudentRegistration(@RequestParam("studentRegId") int studRegId) {
-		String cId = studentRegService.findStudentRegistrationByStudentId(studRegId).getCourseId();
-		studentRegService.deleteByStudentId(studRegId);
-		return "redirect:/courses/showStudentRegListOfCourse?courseId=" + cId;
-	}
-
-	@RequestMapping("/studentRegistrations/showFormForAddStudentReg")
-	public String showFormForAddStudentRegistration(Model model, @RequestParam("courseId") String courseId) {
-		StudentRegistration theStudentReg = new StudentRegistration();
-		theStudentReg.setCourseId(courseId);
-		model.addAttribute("studentReg", theStudentReg);
-		model.addAttribute("courseId", courseId);
-		return "/studentRegistration/studentReg-form";
-	}
-
-	@RequestMapping("/studentRegistrations/save")
-	public String saveStudentRegistration(@Valid @ModelAttribute("studentReg") StudentRegistration studentReg,
-			BindingResult result, Model model) {
-		if (result.hasErrors()) {
-			model.addAttribute("studentReg", studentReg);
-			String courseId = studentReg.getCourseId();
-			model.addAttribute("courseId", courseId);
-			return "/studentRegistration/studentReg-form";
-		}
-		// used for testing
-		StudentRegistration savedStudReg = studentRegService.save(studentReg);
-		model.addAttribute("savedStudReg", savedStudReg);
-		return "redirect:/courses/showStudentRegListOfCourse?courseId="
-				+ studentReg.getCourseId();
-
-	}
-
-	@RequestMapping("/studentRegistrations/showFormForUpdateStudentReg")
-	public String showFormForUpdateStudentReg(Model model, @RequestParam("studentRegId") int studRegId) {
-		StudentRegistration theStudentReg = studentRegService.findStudentRegistrationByStudentId(studRegId);
-		model.addAttribute("studentReg", theStudentReg);
-		// used for link back to Course MYY-xxx in the update page
-		String courseId = theStudentReg.getCourseId();
-		model.addAttribute("courseId", courseId);
-		return "/studentRegistration/studentReg-form";
-	}
-
-	@PostMapping("/courses/upload")
+	
+	@PostMapping("/upload")
 	public String uploadCourseFile(@RequestParam("file") MultipartFile file) throws IOException {
 		courseService.saveCoursesFromFile(file);
 		return "redirect:/courses/list";
 	}
-
-	@PostMapping("/studentReg/upload")
-	public String uploadStudentRegFile(@RequestParam("file") MultipartFile file,
-			@RequestParam("courseId") String courseId) throws IOException {
-		studentRegService.saveStudRegsFromFile(file);
-		return "redirect:/courses/showStudentRegListOfCourse?courseId=" + courseId;
-	}
-
 }

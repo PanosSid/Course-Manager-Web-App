@@ -82,7 +82,7 @@
 	
 	<hr>
 	
-	<form method="POST" th:action="@{/studentReg/upload(courseId=${courseId})}" enctype="multipart/form-data">
+	<form method="POST" th:action="@{/studentRegistrations/upload(courseId=${courseId})}" enctype="multipart/form-data">
     <div class="form-group mt-3" onclick="if (!(confirm('The first line of the csv file must be: AM, First Name, Last Name,Year of Registration, Year of Studies, Semester, Project Grade, Exam Grade'))) return false">
         <label for="file">Select a CSV file</label>
         <input type="file" name="file" class="form-control-file" id="file" accept=".csv">
