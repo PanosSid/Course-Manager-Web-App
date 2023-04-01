@@ -51,10 +51,8 @@ public class StudentRegistrationServiceImp implements StudentRegistrationService
 
 	@Override
 	public void saveStudRegsFromFile(MultipartFile file) throws IOException {
-		if ("text/csv".equals(file.getContentType())) {
-			studRegImporter.setFileLoader("csv");
-			studentRegDao.saveAll(studRegImporter.getStudentRegsFromFile(file));			
-		}
+		studRegImporter.setFileLoader(file.getOriginalFilename().substring(file.getOriginalFilename().indexOf(".")+1));
+		studentRegDao.saveAll(studRegImporter.getStudentRegsFromFile(file));			
 	}
 
 

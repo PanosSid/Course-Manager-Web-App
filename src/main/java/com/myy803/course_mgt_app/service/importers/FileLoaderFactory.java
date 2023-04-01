@@ -5,6 +5,8 @@ public class FileLoaderFactory {
 	public static FileLoader createFileLoader(String type) {
 		if (type.equals("csv") || type.equals("txt")) {
 			return new CSVLoader();
+		} else if (type.equals("xlsx") || type.equals("xls")) {
+			return new ExcelLoader();
 		}
 		return null; 	// temp
 	}

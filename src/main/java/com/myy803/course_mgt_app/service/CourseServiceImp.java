@@ -12,6 +12,7 @@ import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.importers.CourseImporter;
+import com.myy803.course_mgt_app.service.importers.FileLoaderFactory;
 import com.myy803.course_mgt_app.service.statistics.CourseStatisticsService;
 
 @Service
@@ -62,22 +63,19 @@ public class CourseServiceImp implements CourseService {
 	public Map<String, List<Double>> getCourseStatistics(String courseId) {
 		List<StudentRegistration> studRegs = studRegService.findStudentRegistrationsByCourseId(courseId);
 		return statsService.getGradeStatisticsOfStudents(studRegs);
-		
-//		Map<String, List<Double>> mapCalcs = new HashMap<String, List<Double>>();
-//		for (StatisticStrategy statStrat : statCalculationStrategies) {
-//			String stratName = ((TemplateStatisticStrategy) statStrat).getStatisticName();
-//			List<Double> gradesStats = statStrat.calculateStatistcs(studRegs);
-//			mapCalcs.put(stratName, gradesStats);
-//		}
-//		return mapCalcs;
 	}
 	
 	@Override
 	public void saveCoursesFromFile(MultipartFile file) throws IOException {
-		if ("text/csv".equals(file.getContentType())) {
-			courseImporter.setFileLoader("csv");
-			courseDao.saveAll(courseImporter.getCoursesFromFile(file));				
-		}
+		System.out.println(getFileExtention(file));
+		courseImporter.setFileLoader(getFileExtention(file));
+		courseDao.saveAll(courseImporter.getCoursesFromFile(file));
+	}
+
+	private String getFileExtention(MultipartFile file) {
+		System.out.println(file.getOriginalFilename());
+		String ending[] = file.getOriginalFilename().split("\\.");
+		return ending[ending.length-1];
 	}
 
 }
