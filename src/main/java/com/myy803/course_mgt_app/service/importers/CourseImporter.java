@@ -41,22 +41,9 @@ public class CourseImporter {
 		String name = data.get(1);
 		String instructorLogin = data.get(2);
 		String semester = data.get(3);
-		Integer year = Integer.parseInt(removeDecimalPoints(data.get(4).trim()));
+		Integer year = Integer.parseInt(data.get(4).trim());
 		String syllabus = data.get(5);
 		return new Course(courseId, instructorLogin, name, semester, year, syllabus);
 	}
-	
-	
-	
-	private String removeDecimalPoints(String s) {
-		if (s.contains(".")) {
-			return s.substring(0, s.indexOf("."));
-		}
-		return s;
-	}
-	
-	public static void main(String args[]) {
-		String s = "3.078979879";
-		System.out.println(s.substring(0, s.indexOf(".")));
-	}
+
 }

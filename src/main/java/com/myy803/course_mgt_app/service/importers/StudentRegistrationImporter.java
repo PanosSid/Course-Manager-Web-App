@@ -33,10 +33,10 @@ public class StudentRegistrationImporter {
 		if (data.size() != 9) { 	// magic num
 			throw new RuntimeException();
 		}
-		Integer am = Integer.parseInt(data.get(0).substring(0, data.get(0).indexOf(".")));
+		Integer am = Integer.parseInt(data.get(0));
 		String fName = data.get(1);
 		String lName = data.get(2);
-		Integer regYear = Integer.parseInt(data.get(3).substring(0, data.get(3).indexOf(".")));
+		Integer regYear = Integer.parseInt(data.get(3));
 		String studYear = data.get(4);
 		String semester = data.get(5);
 		String courseId = data.get(6);

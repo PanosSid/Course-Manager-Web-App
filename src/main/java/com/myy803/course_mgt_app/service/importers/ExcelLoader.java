@@ -43,13 +43,27 @@ public class ExcelLoader implements FileLoader {
         case Cell.CELL_TYPE_STRING: 
         	return cell.getStringCellValue();
         case Cell.CELL_TYPE_NUMERIC: 
-        	return cell.getNumericCellValue()+"".replaceFirst("\\.[0-9]*", "");
+        	return removeRedundantDecimals(cell.getNumericCellValue());        	
         case Cell.CELL_TYPE_BLANK: 
         	return "";  
         default:
         	return null;
 //        	throw new Exception("Cell type is not numeric or string");
 		}
+	}
+	
+	
+	/*
+	 * Used because cell.getNumericCellValue() returns every number, including integers,
+	 * as a decimal (etx 3 -> 3.0), which can cause issues when converting decimals
+	 * to integers in the importers.
+	 */
+	private String removeRedundantDecimals(double primD) {
+		Double d = Double.valueOf(primD);
+		if (d == d.intValue()) {
+			return d.intValue() + "";
+		}
+		return d.toString();
 	}
 
 }
