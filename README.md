@@ -7,12 +7,14 @@ Developed during the [Software Engineering](https://www.cse.uoi.gr/course/softwa
 The objective of this project is to develop a web application that enables an instructor to efficiently manage their courses and student information, with a focus on managing grading. The application allows instructors to log in, add/remove/update their courses and registered students. Additionally, the application provides overall statistics on student grading to the instructor based on their project and exam grade. Course Manager also supports importing course and student data using CSV files for added convenience.
 
 
+
 ## Features
 Users can:
 - Add/Remove/Update their courses
 - Add/Remove/Update the students that are registered in one of their courses
 - View several statistic metrics of the students grading at a particular course
-- Load courses and student registrations via csv files
+- Load courses and student registrations via csv or excel files
+
 
 
 ## Technologies
