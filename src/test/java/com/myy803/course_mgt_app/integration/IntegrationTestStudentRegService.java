@@ -101,4 +101,28 @@ public class IntegrationTestStudentRegService {
         Assertions.assertEquals(expectedStudRegs, actualStudRegs);
 	}
 	
+	@Test
+	void testfindGradesByTypeAndCourse() {
+		StudentRegistration testStudent2 = new StudentRegistration(22, "StudTmp2", "StudSurname2", 2000,"1","1","MCK-111", 4, 5);
+		StudentRegistration testStudent3 = new StudentRegistration(33, "StudTmp3", "StudSurname3", 2000,"1","1","MCK-111", 9, 10);
+		studRegDao.save(testStudent2);
+		studRegDao.save(testStudent3);
+		
+		List<Double> expPrjGrades = new ArrayList<Double>();
+		expPrjGrades.add(4.0); expPrjGrades.add(9.0);
+		
+		List<Double> expExamGrades = new ArrayList<Double>();
+		expExamGrades.add(5.0); expExamGrades.add(10.0);
+		
+		List<Double> expFinalGrades = new ArrayList<Double>();
+		expFinalGrades.add(4.5); expFinalGrades.add(9.5);
+		
+		Assertions.assertEquals(expPrjGrades, studRegService.findGradesByTypeAndCourse("Project", "MCK-111") );
+		Assertions.assertEquals(expExamGrades, studRegService.findGradesByTypeAndCourse("Exam", "MCK-111") );
+		Assertions.assertEquals(expFinalGrades, studRegService.findGradesByTypeAndCourse("Final", "MCK-111") );
+		
+		studRegDao.delete(testStudent2);
+		studRegDao.delete(testStudent3);
+
+	}
 }
