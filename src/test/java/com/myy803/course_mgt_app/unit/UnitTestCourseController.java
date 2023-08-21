@@ -123,12 +123,10 @@ public class UnitTestCourseController {
 		Course course = new Course("MCK-000", INSTRUCTOR_LOGIN, "MockCourse", "1st", 1, "...");
 		Mockito.when(courseService.findCourseByCourseId("MCK-000")).thenReturn(course);
 
-		Map<String, List<Double>> statsMap = new HashMap<String, List<Double>>();
-		ArrayList<Double> minGradeStats = new ArrayList<Double>();
-		minGradeStats.add(1.0);
-		minGradeStats.add(2.0);
-		minGradeStats.add(3.0);
-		statsMap.put("Min", minGradeStats);
+		Map<String, Double> statsMap = new HashMap<String, Double>();
+		statsMap.put("ProjectMin", 1.0);
+		statsMap.put("ExamMin", 2.0);
+		statsMap.put("FinalMin", 3.0);
 
 		Mockito.when(courseService.getCourseStatistics("MCK-000")).thenReturn(statsMap);
 
