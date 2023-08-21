@@ -23,6 +23,6 @@ public interface StudentRegistrationService {
 
 	void saveStudRegsFromFile(MultipartFile file) throws IOException;
 	
-	List<Double> findGradesByTypeAndCourse(String gradeType, String courseId); 
+	List<Double> findGradesByTypeAndCourse(GradeType gradeType, String courseId); 
 
 }

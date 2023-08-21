@@ -62,10 +62,9 @@ public class CourseServiceImp implements CourseService {
 	@Override	
 	public Map<String, Double> getCourseStatistics(String courseId) {
 		Map<String, Double> stats = new HashMap<String, Double>();
-		List<String> gradeTypes = Arrays.asList("Project", "Exam", "Final");
-		for (String gradeType : gradeTypes) {
+		for (GradeType gradeType : GradeType.values()) {
 			List<Double> grades = studRegService.findGradesByTypeAndCourse(gradeType, courseId);
-			stats.putAll(statsService.calculateGradeStatistics(gradeType, grades));
+			stats.putAll(statsService.calculateGradeStatistics(gradeType, grades));			
 		}
 		return stats;
 	}

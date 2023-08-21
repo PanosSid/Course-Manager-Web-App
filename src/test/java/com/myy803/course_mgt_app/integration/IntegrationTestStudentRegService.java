@@ -15,6 +15,7 @@ import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.dao.StudentRegistrationDAO;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
+import com.myy803.course_mgt_app.service.GradeType;
 import com.myy803.course_mgt_app.service.StudentRegistrationService;
 
 @SpringBootTest
@@ -117,9 +118,9 @@ public class IntegrationTestStudentRegService {
 		List<Double> expFinalGrades = new ArrayList<Double>();
 		expFinalGrades.add(4.5); expFinalGrades.add(9.5);
 		
-		Assertions.assertEquals(expPrjGrades, studRegService.findGradesByTypeAndCourse("Project", "MCK-111") );
-		Assertions.assertEquals(expExamGrades, studRegService.findGradesByTypeAndCourse("Exam", "MCK-111") );
-		Assertions.assertEquals(expFinalGrades, studRegService.findGradesByTypeAndCourse("Final", "MCK-111") );
+		Assertions.assertEquals(expPrjGrades, studRegService.findGradesByTypeAndCourse(GradeType.Project, "MCK-111") );
+		Assertions.assertEquals(expExamGrades, studRegService.findGradesByTypeAndCourse(GradeType.Exam, "MCK-111") );
+		Assertions.assertEquals(expFinalGrades, studRegService.findGradesByTypeAndCourse(GradeType.Final, "MCK-111") );
 		
 		studRegDao.delete(testStudent2);
 		studRegDao.delete(testStudent3);

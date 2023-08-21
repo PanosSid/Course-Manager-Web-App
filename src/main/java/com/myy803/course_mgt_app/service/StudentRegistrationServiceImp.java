@@ -56,15 +56,16 @@ public class StudentRegistrationServiceImp implements StudentRegistrationService
 		studentRegDao.saveAll(studRegImporter.getStudentRegsFromFile(file));			
 	}
 	
-	public List<Double> findGradesByTypeAndCourse(String gradeType, String courseId) {
-		if (gradeType.equals("Project")) {
-			return studentRegDao.findAllProjectGradesByCourseId(courseId);
-		} else if (gradeType.equals("Exam")) {
-			return studentRegDao.findAllExamGradesByCourseId(courseId);
-		} else if (gradeType.equals("Final")) {
-			return findAllFinalGradesByCourse(courseId);
-		} else {
-			throw new RuntimeException("Unknwon grade type");
+	public List<Double> findGradesByTypeAndCourse(GradeType gradeType, String courseId) {
+		switch (gradeType) {
+        	case Project:
+        		return studentRegDao.findAllProjectGradesByCourseId(courseId);
+        	case Exam:
+        		return studentRegDao.findAllExamGradesByCourseId(courseId);
+        	case Final:
+        		return findAllFinalGradesByCourse(courseId);
+        	default:
+        		throw new RuntimeException("Unknwon grade type");
 		}
 	}
 
@@ -76,6 +77,5 @@ public class StudentRegistrationServiceImp implements StudentRegistrationService
 		}
 		return finalGrades;
 	}
-
 
 }
