@@ -1,7 +1,6 @@
 package com.myy803.course_mgt_app.controller;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -78,39 +77,15 @@ public class CourseController {
 		courseService.deleteByCourseId(courseId);
 		return "redirect:/courses/list";
 	}
-
-
+	
 	@GetMapping("/showStatisticsOfCourse")
 	public String showStatisticsOfCourse(@RequestParam("courseId") String courseId, Model model) {
 		setStatistcsPageTile(courseId, model);
-		Map<String, List<Double>> statsMap = courseService.getCourseStatistics(courseId);
-		setStatsToModel(model, statsMap);
-		return "/courses/course-statistics";
-	}
-
-	private void setStatsToModel(Model model, Map<String, List<Double>> statsMap) {
-		// ex. stasMap = {"Min" : [projectGrade, examGrade, finalGrade],
-		//		"Max" : [projectGrade,examGrade, finalGrade] ...}
-		
-		Map<String, Double> projectMap = new HashMap<String, Double>();
-		Map<String, Double> examMap = new HashMap<String, Double>();
-		Map<String, Double> finalMap = new HashMap<String, Double>();
-
-		for (Map.Entry<String, List<Double>> set : statsMap.entrySet()) {
-			String statisticName = set.getKey();
-			projectMap.put(set.getKey(), set.getValue().get(0));
-			examMap.put(set.getKey(), set.getValue().get(1));
-			finalMap.put(set.getKey(), set.getValue().get(2));
-			model.addAttribute("Project" + statisticName, projectMap.get(statisticName));
-			model.addAttribute("Exam" + statisticName, examMap.get(statisticName));
-			model.addAttribute("Final" + statisticName, finalMap.get(statisticName));
+		Map<String, Double> statsMap = courseService.getCourseStatistics(courseId);
+		for (String statName : statsMap.keySet()) {
+			model.addAttribute(statName, statsMap.get(statName));
 		}
-		
-		//TODO remove these
-		// these attributes are used only for acceptance testing to make our life easier
-		model.addAttribute("projectMap", projectMap);
-		model.addAttribute("examMap", examMap);
-		model.addAttribute("finalMap", finalMap);
+		return "/courses/course-statistics";
 	}
 
 	public void setStatistcsPageTile(String courseId, Model model) {
