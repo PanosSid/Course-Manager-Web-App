@@ -98,7 +98,7 @@ public class IntegrationTestCourseService {
 		}
 	}
 
-	private Map<String, Double> createExpectedStatisticsValues() {
+	public static Map<String, Double> createExpectedStatisticsValues() {
 		Map<String, Double> expectedStatsMap = new HashMap<String, Double>();
 		expectedStatsMap.put("ProjectMin", 2.0);
 		expectedStatsMap.put("ExamMin", 1.5);
