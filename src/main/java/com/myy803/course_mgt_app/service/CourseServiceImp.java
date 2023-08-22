@@ -1,11 +1,13 @@
 package com.myy803.course_mgt_app.service;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,6 +82,36 @@ public class CourseServiceImp implements CourseService {
 		System.out.println(file.getOriginalFilename());
 		String ending[] = file.getOriginalFilename().split("\\.");
 		return ending[ending.length-1];
+	}
+
+	@Override
+	public String getCourseGradeDistribution(String courseId, List<GradeType> gradeTypes) {
+		JSONArray arr = new JSONArray();
+		for (GradeType gradeType : gradeTypes) {
+			List<Double> grades = studRegService.findGradesByTypeAndCourse(gradeType, courseId);
+			Map<Double, Integer> distribution = statsService.calculateDistribution(grades);
+			List<JSONObject> distrObjs = createJsonObjsFromDistribution(distribution, gradeType);
+			loadJsonObjsToArray(distrObjs, arr);
+		}
+		return arr.toString();
+	}
+
+	private List<JSONObject> createJsonObjsFromDistribution(Map<Double, Integer> distribution, GradeType gradeType) {
+		List<JSONObject> list = new ArrayList<JSONObject>();
+		for (Double key : distribution.keySet()) {
+			JSONObject obj = new JSONObject();
+			obj.put("gradeType", gradeType);
+			obj.put("gradeValue", key);
+			obj.put("count", distribution.get(key));
+			list.add(obj);
+		}
+		return list;
+	}
+	
+	private void loadJsonObjsToArray(List<JSONObject> distrObjs, JSONArray arr) {
+		for (JSONObject obj : distrObjs) {
+			arr.put(obj);
+		}
 	}
 
 }

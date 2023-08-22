@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,20 @@ public class CourseStatisticsServiceImp implements CourseStatisticsService {
 	
 	private String createStatMapKey(GradeType gradeType, String stratName) {
 		return gradeType+stratName;
+	}
+
+	@Override
+	public Map<Double, Integer> calculateDistribution(List<Double> grades) {
+		Frequency frequency = new Frequency();
+		for (Double g : grades) {
+			frequency.addValue(g);
+		}
+		
+		Map<Double, Integer> distribution = new HashMap<Double, Integer>();
+		for (double i = 0.0; i <= 10.0; i += 0.5) {
+			distribution.put(i, (int) frequency.getCount(i));
+		}
+		return distribution;
 	}
 	
 }

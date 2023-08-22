@@ -1,6 +1,7 @@
 package com.myy803.course_mgt_app.controller;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.service.CourseService;
+import com.myy803.course_mgt_app.service.GradeType;
 
 @Controller
 @RequestMapping("/courses")
@@ -110,4 +112,13 @@ public class CourseController {
 		courseService.saveCoursesFromFile(file);
 		return "redirect:/courses/list";
 	}
+	
+	@GetMapping("/distribution")
+	public String showGradesDistribution(@RequestParam("courseId") String courseId, List<String> gradeTypes, Model model) {
+		List<GradeType> selectedGradeTypes = GradeType.createFromStrings(gradeTypes);
+		String distrJsonStr = courseService.getCourseGradeDistribution(courseId, selectedGradeTypes);
+		model.addAttribute("jsonData", distrJsonStr);
+		return "/courses/distribution";
+	}
+	
 }

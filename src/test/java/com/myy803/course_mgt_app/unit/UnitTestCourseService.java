@@ -135,4 +135,26 @@ public class UnitTestCourseService  {
         Mockito.verify(courseDAO).saveAll(courses);
 	}
 	
+	@Test
+	void testGetCourseGradeDistribution() {
+		Map<Double, Integer> distribution = new HashMap<>();
+		distribution.put(1.0, 1); distribution.put(5.0, 2); distribution.put(10.0, 0); 
+		
+		List<Double> grades = new ArrayList<Double>();
+		grades.add(1.0); grades.add(5.0); grades.add(5.0); 
+		
+		Mockito.when(studRegService.findGradesByTypeAndCourse(Mockito.any(GradeType.class), Mockito.eq("TTT-000"))).thenReturn(grades);
+		Mockito.when(statsService.calculateDistribution(Mockito.eq(grades))).thenReturn(distribution);
+		
+		List<GradeType> gTypes = new ArrayList<GradeType>();
+		gTypes.add(GradeType.Exam);
+		
+		String actualStr = courseService.getCourseGradeDistribution("TTT-000", gTypes);
+		String expectedStr = ""
+				+ "[{\"gradeValue\":1,\"gradeType\":\"Exam\",\"count\":1},"
+				+ "{\"gradeValue\":5,\"gradeType\":\"Exam\",\"count\":2},"
+				+ "{\"gradeValue\":10,\"gradeType\":\"Exam\",\"count\":0}]";
+		Assertions.assertEquals(expectedStr, actualStr);
+		
+	}
 }
