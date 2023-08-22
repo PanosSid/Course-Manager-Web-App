@@ -4,14 +4,14 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MaxStatisticStrategy extends TemplateStatisticStrategy{
+public class MaxStatisticStrategy extends StatisticStrategy{
 
 	public MaxStatisticStrategy() {
 		super("Max");	// set name of the statistic
 	}
 
 	@Override
-	public double doActualCalculation(DescriptiveStatistics ds) {
+	public double calculateStatistic(DescriptiveStatistics ds) {
 		return ds.getMax();
 	}
 
