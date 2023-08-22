@@ -1,6 +1,8 @@
 package com.myy803.course_mgt_app.service;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,9 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.model.Course;
-import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.importers.CourseImporter;
-import com.myy803.course_mgt_app.service.importers.FileLoaderFactory;
 import com.myy803.course_mgt_app.service.statistics.CourseStatisticsService;
 
 @Service
@@ -59,10 +59,14 @@ public class CourseServiceImp implements CourseService {
 		courseDao.delete(c);
 	}
 
-	@Override
-	public Map<String, List<Double>> getCourseStatistics(String courseId) {
-		List<StudentRegistration> studRegs = studRegService.findStudentRegistrationsByCourseId(courseId);
-		return statsService.getGradeStatisticsOfStudents(studRegs);
+	@Override	
+	public Map<String, Double> getCourseStatistics(String courseId) {
+		Map<String, Double> stats = new HashMap<String, Double>();
+		for (GradeType gradeType : GradeType.values()) {
+			List<Double> grades = studRegService.findGradesByTypeAndCourse(gradeType, courseId);
+			stats.putAll(statsService.calculateGradeStatistics(gradeType, grades));			
+		}
+		return stats;
 	}
 	
 	@Override

@@ -22,5 +22,7 @@ public interface StudentRegistrationService {
 	void deleteByStudentId(int id);
 
 	void saveStudRegsFromFile(MultipartFile file) throws IOException;
+	
+	List<Double> findGradesByTypeAndCourse(GradeType gradeType, String courseId); 
 
 }

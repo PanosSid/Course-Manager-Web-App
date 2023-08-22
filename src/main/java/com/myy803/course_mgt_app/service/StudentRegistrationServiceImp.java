@@ -2,6 +2,7 @@ package com.myy803.course_mgt_app.service;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,27 @@ public class StudentRegistrationServiceImp implements StudentRegistrationService
 		studRegImporter.setFileLoader(file.getOriginalFilename().substring(file.getOriginalFilename().indexOf(".")+1));
 		studentRegDao.saveAll(studRegImporter.getStudentRegsFromFile(file));			
 	}
+	
+	public List<Double> findGradesByTypeAndCourse(GradeType gradeType, String courseId) {
+		switch (gradeType) {
+        	case Project:
+        		return studentRegDao.findAllProjectGradesByCourseId(courseId);
+        	case Exam:
+        		return studentRegDao.findAllExamGradesByCourseId(courseId);
+        	case Final:
+        		return findAllFinalGradesByCourse(courseId);
+        	default:
+        		throw new RuntimeException("Unknwon grade type");
+		}
+	}
 
+	private List<Double> findAllFinalGradesByCourse(String courseId) {
+		List<StudentRegistration> students = studentRegDao.findStudentRegistrationsByCourseId(courseId);
+		List<Double> finalGrades = new ArrayList<Double>();
+		for (StudentRegistration student : students) {	
+			finalGrades.add(student.getFinalGrade());
+		}
+		return finalGrades;
+	}
 
 }

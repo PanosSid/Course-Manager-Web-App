@@ -9,10 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,8 +34,10 @@ import org.springframework.web.servlet.FlashMap;
 import com.myy803.course_mgt_app.controller.CourseController;
 import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.dao.StudentRegistrationDAO;
+import com.myy803.course_mgt_app.integration.IntegrationTestCourseService;
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.model.StudentRegistration;
+import com.myy803.course_mgt_app.service.GradeType;
 
 @SpringBootTest
 @TestPropertySource(locations = "classpath:application-test.properties")
@@ -196,37 +196,17 @@ public class AcceptanceTestCourseController {
 	    andExpect(view().name("/courses/course-statistics")).
 	    andReturn();
 		
-		@SuppressWarnings("unchecked")
-		Map<String, Double> projectMap = (Map<String, Double>) result.getModelAndView().getModel().get("projectMap");
-		@SuppressWarnings("unchecked")
-		Map<String, Double> examMap = (Map<String, Double>) result.getModelAndView().getModel().get("examMap");
-		@SuppressWarnings("unchecked")
-		Map<String, Double> finalMap = (Map<String, Double>) result.getModelAndView().getModel().get("finalMap");
+		Map<String, Double> expectedStatsMap = IntegrationTestCourseService.createExpectedStatisticsValues();
 		
+		Map<String, Object> modelAttributes = result.getModelAndView().getModel();
+		System.out.println(modelAttributes);
 		String statNames[] = {"Min", "Max", "Mean", "StandardDeviation", "Variance", "Skewness", "Percentile"};
-		double statProjectValues[] = {2.0, 10.0, 6.0, 4.0, 16.0, 0.0, 6.0};
-		double statExamValues[] = {1.5, 9.5, 5.0, 4.093, 16.75, 1.034, 4.0};
-		double statFinalValues[] = {2, 10, 5.667, 4.041, 16.333, 0.722, 5.0};
-		Map<String, Double> statProjectMap = setExpectedValuesToStats(statProjectValues, statNames);
-		Map<String, Double> statExamMap = setExpectedValuesToStats(statExamValues, statNames);
-		Map<String, Double> statFinalMap = setExpectedValuesToStats(statFinalValues, statNames);
-		
-		for (Entry<String, Double> set :  projectMap.entrySet()) {
-			String statName = set.getKey();
+		for (GradeType gt : GradeType.values()) {
 			for (int i = 0; i < statNames.length; i++) {
-				Assertions.assertEquals(statProjectMap.get(statName), projectMap.get(statName));
-				Assertions.assertEquals(statExamMap.get(statName), examMap.get(statName));
-				Assertions.assertEquals(statFinalMap.get(statName), finalMap.get(statName));
+				String attrName = gt+statNames[i];
+				Assertions.assertEquals(expectedStatsMap.get(attrName), (Double) modelAttributes.get(attrName), 0.001);
 			}
 		}
-	}
-
-	private Map<String, Double> setExpectedValuesToStats(double[] statProjectValues, String[] statNames) {
-		Map<String, Double> statMap = new HashMap<String, Double>();
-		for (int i = 0; i < statNames.length; i++) {
-			statMap.put(statNames[i], statProjectValues[i]);			
-		}
-		return statMap;
 	}
 	
 	@Test

@@ -18,8 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.myy803.course_mgt_app.dao.CourseDAO;
 import com.myy803.course_mgt_app.model.Course;
-import com.myy803.course_mgt_app.model.StudentRegistration;
 import com.myy803.course_mgt_app.service.CourseServiceImp;
+import com.myy803.course_mgt_app.service.GradeType;
 import com.myy803.course_mgt_app.service.StudentRegistrationService;
 import com.myy803.course_mgt_app.service.importers.CourseImporter;
 import com.myy803.course_mgt_app.service.statistics.CourseStatisticsServiceImp;
@@ -40,7 +40,7 @@ public class UnitTestCourseService  {
 	private StudentRegistrationService studRegService;
 	
 	@Mock
-	private CourseStatisticsServiceImp statsCalculator;
+	private CourseStatisticsServiceImp statsService;
 	
 	private Course testCourse = new Course(100,"TMP-123", "instructor_tester", "TmpCourse", "1st", 1, "...");
 	
@@ -101,34 +101,20 @@ public class UnitTestCourseService  {
 	}
 	
 	@Test
-	void testGetCourseStatisticsReturnsNotNullMap() {		
-		List<StudentRegistration> studRegList = new ArrayList<StudentRegistration>();
-		studRegList.add(new StudentRegistration (11, "TopStud", "StudSurnam1e", 2018,"4th","8th","TTT-000", 10, 9.5));
-		studRegList.add(new StudentRegistration (22, "AverageStud", "StudSurname2", 2017,"5th","9th","TTT-000", 6, 4));
-		studRegList.add(new StudentRegistration (33, "BadStud", "StudSurname3", 2013,"5th","10th","TTT-000", 2, 1.5));
-
-		Map<String, List<Double>> expectedStatsMap = new HashMap<>();
-		expectedStatsMap.put("Min", convertToList(2.0, 1.5, 2));
-		expectedStatsMap.put("Max", convertToList(10.0, 9.5, 10));
-		expectedStatsMap.put("Mean", convertToList(6, 5.0, 5.667));
-		expectedStatsMap.put("StandardDeviation", convertToList(4, 4.093, 4.041));
-		expectedStatsMap.put("Variance", convertToList(16.0, 16.75, 16.333));
-		expectedStatsMap.put("Skewness", convertToList(0.0, 1.034, 0.722));
-		expectedStatsMap.put("Percentile", convertToList(6.0, 4.0, 5.0));
+	void testGetCourseStatisticsReturnsNotNullMap() {			
+		Map<String, Double> expectedStatsMap = new HashMap<>();
+		List<Double> grades = new ArrayList<Double>(); 
+		grades.add(10.0); grades.add(6.0); grades.add(1.0);
 		
-		Mockito.when(studRegService.findStudentRegistrationsByCourseId("TTT-000")).thenReturn(studRegList);
-		Mockito.when(statsCalculator.getGradeStatisticsOfStudents(studRegList)).thenReturn(expectedStatsMap);
-		Map<String, List<Double>> actualStatsMap = courseService.getCourseStatistics("TTT-000");
+		Mockito.when(studRegService.findGradesByTypeAndCourse(Mockito.any(GradeType.class), Mockito.eq("TTT-000"))).thenReturn(grades);
+		Mockito.when(statsService.calculateGradeStatistics(Mockito.any(GradeType.class), Mockito.eq(grades))).thenReturn(expectedStatsMap);
 		
+		Map<String, Double> actualStatsMap = courseService.getCourseStatistics("TTT-000");
+		
+		Assertions.assertNotNull(actualStatsMap);
 		Assertions.assertEquals(expectedStatsMap, actualStatsMap);
-		Mockito.verify(studRegService).findStudentRegistrationsByCourseId("TTT-000");
-		Mockito.verify(statsCalculator).getGradeStatisticsOfStudents(studRegList);
-	}
-	
-	private List<Double> convertToList(double proj, double exam, double f) {
-		List<Double> l = new ArrayList<Double>();
-		l.add(proj); l.add(exam); l.add(f);
-		return l;
+		Mockito.verify(statsService, Mockito.times(3)).calculateGradeStatistics(Mockito.any(GradeType.class),  Mockito.eq(grades));
+		Mockito.verify(studRegService, Mockito.times(3)).findGradesByTypeAndCourse(Mockito.any(GradeType.class), Mockito.eq("TTT-000"));
 	}
 	
 	@Test 

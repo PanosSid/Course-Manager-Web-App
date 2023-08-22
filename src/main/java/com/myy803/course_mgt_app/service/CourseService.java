@@ -20,10 +20,8 @@ public interface CourseService {
 
 	void deleteByCourseId(String courseId);
 
-	Map<String, List<Double>> getCourseStatistics(String courseId);
+	Map<String, Double> getCourseStatistics(String courseId);
 
 	void saveCoursesFromFile(MultipartFile file) throws IOException;
-
-
-
+	
 }

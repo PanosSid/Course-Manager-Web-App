@@ -90,27 +90,44 @@ public class IntegrationTestCourseService {
 		studRegService.save(new StudentRegistration (22, "AverageStud", "StudSurname2", 2017,"5th","9th","TTT-000", 6, 4));
 		studRegService.save(new StudentRegistration (33, "BadStud", "StudSurname3", 2013,"5th","10th","TTT-000", 2, 1.5));
 
-		Map<String, List<Double>> expectedStatsMap = new HashMap<>();
-		expectedStatsMap.put("Min", convertToList(2.0, 1.5, 2));
-		expectedStatsMap.put("Max", convertToList(10.0, 9.5, 10));
-		expectedStatsMap.put("Mean", convertToList(6, 5.0, 5.667));
-		expectedStatsMap.put("StandardDeviation", convertToList(4, 4.093, 4.041));
-		expectedStatsMap.put("Variance", convertToList(16.0, 16.75, 16.333));
-		expectedStatsMap.put("Skewness", convertToList(0.0, 1.034, 0.722));
-		expectedStatsMap.put("Percentile", convertToList(6.0, 4.0, 5.0));
-		
-		Map<String, List<Double>> actualStatsMap = courseService.getCourseStatistics("TTT-000");
-		for (String key : expectedStatsMap.keySet()) {
-		    Assertions.assertEquals(expectedStatsMap.get(key), actualStatsMap.get(key));
+		Map<String, Double> expectedStatsMap = createExpectedStatisticsValues();
+
+		Map<String, Double> actualStatsMap = courseService.getCourseStatistics("TTT-000");
+		for (String key : actualStatsMap.keySet()) {
+		    Assertions.assertEquals(expectedStatsMap.get(key), actualStatsMap.get(key), 0.001);
 		}
 	}
-	
-	private List<Double> convertToList(double proj, double exam, double f) {
-		List<Double> l = new ArrayList<Double>();
-		l.add(proj);
-		l.add(exam);
-		l.add(f);
-		return l;
+
+	public static Map<String, Double> createExpectedStatisticsValues() {
+		Map<String, Double> expectedStatsMap = new HashMap<String, Double>();
+		expectedStatsMap.put("ProjectMin", 2.0);
+		expectedStatsMap.put("ExamMin", 1.5);
+		expectedStatsMap.put("FinalMin", 2.0);
+		
+		expectedStatsMap.put("ProjectMax", 10.0);
+		expectedStatsMap.put("ExamMax", 9.5);
+		expectedStatsMap.put("FinalMax", 10.0);
+		
+		expectedStatsMap.put("ProjectMean", 6.0);
+		expectedStatsMap.put("ExamMean", 5.0);
+		expectedStatsMap.put("FinalMean", 5.666666666666667);
+
+		expectedStatsMap.put("ProjectStandardDeviation", 4.0);
+		expectedStatsMap.put("ExamStandardDeviation", 4.093);
+		expectedStatsMap.put("FinalStandardDeviation", 4.041);
+		
+		expectedStatsMap.put("ProjectVariance", 16.0);
+		expectedStatsMap.put("ExamVariance", 16.75);
+		expectedStatsMap.put("FinalVariance", 16.333);
+		
+		expectedStatsMap.put("ProjectSkewness", 0.0);
+		expectedStatsMap.put("ExamSkewness", 1.034);
+		expectedStatsMap.put("FinalSkewness", 0.722);
+		
+		expectedStatsMap.put("ProjectPercentile", 6.0);
+		expectedStatsMap.put("ExamPercentile", 4.0);
+		expectedStatsMap.put("FinalPercentile", 5.0);
+		return expectedStatsMap;
 	}
 	
 	@Test 
