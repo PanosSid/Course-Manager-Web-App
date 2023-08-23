@@ -114,9 +114,10 @@ public class CourseController {
 	}
 	
 	@GetMapping("/distribution")
-	public String showGradesDistribution(@RequestParam("courseId") String courseId, List<String> gradeTypes, Model model) {
+	public String showGradesDistribution(/*@RequestParam("courseId") String courseId, List<String> gradeTypes,*/ Model model) {
+		List<String> gradeTypes = Arrays.asList("Project", "Exam");
 		List<GradeType> selectedGradeTypes = GradeType.createFromStrings(gradeTypes);
-		String distrJsonStr = courseService.getCourseGradeDistribution(courseId, selectedGradeTypes);
+		String distrJsonStr = courseService.getCourseGradeDistribution("MYY-301", selectedGradeTypes);
 		model.addAttribute("jsonData", distrJsonStr);
 		return "/courses/distribution";
 	}
