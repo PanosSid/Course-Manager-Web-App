@@ -79,7 +79,8 @@
   		var xScale = d3.scaleBand()
     		.domain([...Array(21).keys()].map(d => d * 0.5))  // Creating the domain with the desired values
     		.range([0, width])
-    		.paddingInner(0.1);
+    		.padding(0.2)
+    		.paddingInner(0.2);
 
         var yScale = d3.scaleLinear()
             .domain([0, d3.max(data, d => d.count)])

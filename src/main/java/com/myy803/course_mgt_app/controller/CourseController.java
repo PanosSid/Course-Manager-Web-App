@@ -113,11 +113,15 @@ public class CourseController {
 		return "redirect:/courses/list";
 	}
 	
-	@GetMapping("/distribution")
-	public String showGradesDistribution(/*@RequestParam("courseId") String courseId, List<String> gradeTypes,*/ Model model) {
-		List<String> gradeTypes = Arrays.asList("Project", "Exam");
-		List<GradeType> selectedGradeTypes = GradeType.createFromStrings(gradeTypes);
-		String distrJsonStr = courseService.getCourseGradeDistribution("MYY-301", selectedGradeTypes);
+	@PostMapping("/distribution")
+	public String showGradesDistribution(@RequestParam("courseId") String courseId,  Model model,
+			@RequestParam(value = "selectedCategories", required = false, defaultValue = "") List<String> selectedCategories) {
+		if (selectedCategories.isEmpty()) {
+	        model.addAttribute("errorMessage", "Please select at least one grade category.");
+	        return "/courses/course-statistics";
+		}
+		List<GradeType> selectedGradeTypes = GradeType.createFromStrings(selectedCategories);
+		String distrJsonStr = courseService.getCourseGradeDistribution(courseId, selectedGradeTypes);
 		model.addAttribute("jsonData", distrJsonStr);
 		return "/courses/distribution";
 	}
