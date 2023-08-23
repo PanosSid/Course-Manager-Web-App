@@ -1,44 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grouped Bar Chart</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <style>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Grouped Bar Chart</title>
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
 
         #chart {
             background-color: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            margin: 20px auto;
             padding: 20px;
+            width: 80%;
             max-width: 800px;
+            margin-bottom: 20px;
         }
 
-        .bar {
-            transition: fill 0.2s;
+        button {
+            background-color: #1f77b4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
 
-        .bar:hover {
-            fill-opacity: 0.8;
+        button:hover {
+            background-color: #156589;
         }
-
-        .axis text {
-            font-size: 12px;
-        }
-
+        
         .legend {
-            font-size: 14px;
             display: flex;
             align-items: center;
-            margin-top: 10px;
+            font-size: 14px;
         }
 
         .legend-color {
@@ -47,104 +54,220 @@
             margin-right: 8px;
         }
     </style>
-</head>
-<body>
+    </head>
+    <body>
+        <h1>Grade Distribution</h1>
+        <div id="chart"></div>
+        <button id="switchChart">Switch Chart Type</button>
+        <script th:inline="javascript">
+                	var jsonStr = /*[[ ${jsonData} ]]*/;
+                	//console.log(jsonStr);
+                    // Sample data structure
+                    var data = JSON.parse(jsonStr);
+                	//console.log(data);
 
-	<h1>Grade Distribution</h1>
-    <div id="chart"></div>
-	<script th:inline="javascript">
-    	var jsonStr = /*[[ ${jsonData} ]]*/;
-    	console.log(jsonStr);
-        // Sample data structure
-        var data = JSON.parse(jsonStr);
-    	console.log(data);
-    	
-        // Set up dimensions for the chart
-        var margin = { top: 30, right: 30, bottom: 50, left: 60 };
-        var width = 800 - margin.left - margin.right;
-        var height = 400 - margin.top - margin.bottom;
+                    // Set up dimensions for the chart
+                    var margin = { top: 30, right: 30, bottom: 50, left: 60 };
+                    var width = 800 - margin.left - margin.right;
+                    var height = 400 - margin.top - margin.bottom;
 
-        // Create an SVG container
-        var svg = d3.select("#chart")
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                    // Create an SVG container
+                    var svg = d3.select("#chart")
+                        .append("svg")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // Group data by grade type
-        var dataGrouped = d3.group(data, d => d.gradeType);
+                    // Group data by grade type
+                    var dataGrouped = d3.group(data, d => d.gradeType);
 
-        // Set up scales
-  		var xScale = d3.scaleBand()
-    		.domain([...Array(21).keys()].map(d => d * 0.5))  // Creating the domain with the desired values
-    		.range([0, width])
-    		.padding(0.2)
-    		.paddingInner(0.2);
+                    function createBarChart() {
+                        svg.selectAll("*").remove();
 
-        var yScale = d3.scaleLinear()
-            .domain([0, d3.max(data, d => d.count)])
-            .range([height, 0]);
+                        // Set up scales
+                        var xScale = d3.scaleBand()
+                            .domain([...Array(21).keys()].map(d => d * 0.5))
+                            .range([0, width])
+                            .padding(0.2)
+                            .paddingInner(0.2);
 
-        // Set up color scale for bars
-        var color = d3.scaleOrdinal()
-            .domain(data.map(d => d.gradeType))
-            .range(["#1f77b4", "#ff7f0e", "#2ca02c"]);
+                        var yScale = d3.scaleLinear()
+                            .domain([0, d3.max(data, d => d.count)])
+                            .range([height, 0]);
 
-        // Draw bars
-        svg.selectAll(".bar")
-            .data(data)
-            .enter().append("rect")
-            .attr("class", "bar")		// to 3 prepei na to bazoyme dinamika analoga me to poses katigories exoume!!
-            .attr("x", d => xScale(d.gradeValue) + xScale.bandwidth() * color.domain().indexOf(d.gradeType) / 3) 
-            .attr("y", d => yScale(d.count))
-            .attr("width", xScale.bandwidth() / 3)
-            .attr("height", d => height - yScale(d.count))
-            .attr("fill", d => color(d.gradeType));
+                        // Set up color scale for bars
+                        var color = d3.scaleOrdinal()
+                            .domain(data.map(d => d.gradeType))
+                            .range(["#1f77b4", "#ff7f0e", "#2ca02c"]);
 
-        // Add x-axis
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(d3.axisBottom(xScale));
+                        // Calculate the total group width (including padding)
+                        var totalGroupWidth = xScale.bandwidth();
 
-        // Add y-axis
-        svg.append("g")
-            .call(d3.axisLeft(yScale));
+                        // Calculate the bar width within each group
+                        var barWidth = totalGroupWidth / color.domain().length;
 
-        // Add x-axis label
-        svg.append("text")
-            .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.top + 10) + ")")
-            .style("text-anchor", "middle")
-            .text("Grade Labels");
+                        // Draw bars
+                        svg.selectAll(".bar")
+                            .data(data)
+                            .enter().append("rect")
+                            .attr("class", "bar")
+                            .attr("x", d => xScale(d.gradeValue) + (barWidth * color.domain().indexOf(d.gradeType)))
+                            .attr("y", d => yScale(d.count))
+                            .attr("width", barWidth)
+                            .attr("height", d => height - yScale(d.count))
+                            .attr("fill", d => color(d.gradeType));
 
-        // Add y-axis label
-        svg.append("text")
-            .attr("transform", "rotate(-90)")
-            .attr("y", 0 - margin.left)
-            .attr("x", 0 - (height / 2))
-            .attr("dy", "1em")
-            .style("text-anchor", "middle")
-            .text("Count");
+                    // Add x-axis
+                    svg.append("g")
+                        .attr("transform", "translate(0," + height + ")")
+                        .call(d3.axisBottom(xScale));
 
-        // Add legend
-        var legend = svg.selectAll(".legend")
-            .data(color.domain())
-            .enter().append("g")
-            .attr("class", "legend")
-            .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+                    // Add y-axis
+                    svg.append("g")
+                        .call(d3.axisLeft(yScale));
 
-        legend.append("rect")
-            .attr("x", width - 18)
-            .attr("width", 18)
-            .attr("height", 18)
-            .style("fill", color);
+                    // Add x-axis label
+                    svg.append("text")
+                        .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.top + 10) + ")")
+                        .style("text-anchor", "middle")
+                        .text("Grades");
 
-        legend.append("text")
-            .attr("x", width - 24)
-            .attr("y", 9)
-            .attr("dy", ".35em")
-            .style("text-anchor", "end")
-            .text(function (d) { return d; });
-    </script>
-</body>
+                    // Add y-axis label
+                    svg.append("text")
+                        .attr("transform", "rotate(-90)")
+                        .attr("y", 0 - margin.left)
+                        .attr("x", 0 - (height / 2))
+                        .attr("dy", "1em")
+                        .style("text-anchor", "middle")
+                        .text("Frequency");
+
+                    // Add legend
+                    var legend = svg.selectAll(".legend")
+                        .data(color.domain())
+                        .enter().append("g")
+                        .attr("class", "legend")
+                        .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+
+                    legend.append("rect")
+                        .attr("x", width - 18)
+                        .attr("width", 18)
+                        .attr("height", 18)
+                        .style("fill", color);
+
+                    legend.append("text")
+                        .attr("x", width - 24)
+                        .attr("y", 9)
+                        .attr("dy", ".35em")
+                        .style("text-anchor", "end")
+                        .text(function (d) { return d; });
+               }
+
+                 // Function to create line chart
+	function createLineChart() {
+                // Clear previous chart
+                svg.selectAll("*").remove();
+
+                data.sort(function(a, b) {
+                    return a.gradeValue - b.gradeValue;
+                });
+
+                // Set up scales
+    			var xScale = d3.scaleLinear()
+        			.domain([0, d3.max(data, d => d.gradeValue)])
+        			.range([0, width]);
+
+                var yScale = d3.scaleLinear()
+                    .domain([0, d3.max(data, d => d.count)])
+                    .range([height, 0]);
+
+                // Set up color scale for lines
+                var color = d3.scaleOrdinal()
+                    .domain(data.map(d => d.gradeType))
+                    .range(["#1f77b4", "#ff7f0e", "#2ca02c"]);
+
+                // Define line generator
+                var line = d3.line()
+                    .x(d => xScale(d.gradeValue))
+                    .y(d => yScale(d.count));
+
+                // Draw lines
+                var lineGroups = svg.selectAll(".line")
+                    .data(d3.group(data, d => d.gradeType))
+                    .enter().append("g")
+                    .attr("class", "line");
+
+                lineGroups.append("path")
+                    .attr("fill", "none")
+                    .attr("stroke", d => color(d[0]))
+                    .attr("stroke-width", 2)
+                    .attr("d", d => line(d[1]));
+
+                // Add x-axis
+                svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(xScale));
+
+                // Add y-axis
+                svg.append("g")
+                    .call(d3.axisLeft(yScale));
+
+                // Add x-axis label
+                svg.append("text")
+                    .attr("transform", "translate(" + (width / 2) + " ," + (height + margin.top + 10) + ")")
+                    .style("text-anchor", "middle")
+                    .text("Grades");
+
+                // Add y-axis label
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 0 - margin.left)
+                    .attr("x", 0 - (height / 2))
+                    .attr("dy", "1em")
+                    .style("text-anchor", "middle")
+                    .text("Frequency");
+
+                // Add legend
+                var legend = svg.selectAll(".legend")
+                    .data(color.domain())
+                    .enter().append("g")
+                    .attr("class", "legend")
+                    .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+
+                legend.append("rect")
+                    .attr("x", width - 18)
+                    .attr("width", 18)
+                    .attr("height", 18)
+                    .style("fill", color);
+
+                legend.append("text")
+                    .attr("x", width - 24)
+                    .attr("y", 9)
+                    .attr("dy", ".35em")
+                    .style("text-anchor", "end")
+                    .text(function (d) { return d; });
+            }
+
+
+
+                    var isBarChart = true; // Default to bar chart
+
+                    function updateChart() {
+                        if (isBarChart) {
+                        	createBarChart();
+                        } else {
+                            createLineChart();
+                        }
+                    }
+
+                    // Event listener for the button
+                    document.getElementById("switchChart").addEventListener("click", function () {
+                        isBarChart = !isBarChart;
+                        updateChart();
+                    });
+
+                    // Initial chart creation
+                    updateChart();
+        </script>
+    </body>
 </html>
