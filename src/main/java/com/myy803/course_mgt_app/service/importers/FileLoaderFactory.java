@@ -7,7 +7,9 @@ public class FileLoaderFactory {
 			return new CSVLoader();
 		} else if (type.equals("xlsx") || type.equals("xls")) {
 			return new ExcelLoader();
+		} else if (type.equals("application/json") || type.equals("text/json")) {
+			return new JSONLoader();
 		}
-		return null; 	// temp
+		throw new RuntimeException("Unknown file type:'"+type+"'"); 
 	}
 }

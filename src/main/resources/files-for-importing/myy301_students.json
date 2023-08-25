@@ -1,0 +1,79 @@
+[
+    {
+        "StudentId": "3333",
+        "FirstName": "Name3",
+        "LastName": "LName3",
+        "RegistrationYear": 2017,
+        "YearOfStudies": 3,
+        "Semester": 5,
+        "CourseId": "MYY-301",
+        "ProjectGrade": 2.5,
+        "ExamGrade": 3.5
+    },
+    {
+        "StudentId": "4444",
+        "FirstName": "Name4",
+        "LastName": "LName4",
+        "RegistrationYear": 1995,
+        "YearOfStudies": 5,
+        "Semester": 10,
+        "CourseId": "MYY-301",
+        "ProjectGrade": 8.5,
+        "ExamGrade": 6.5
+    },
+    {
+        "StudentId": "5555",
+        "FirstName": "Name5",
+        "LastName": "LName5",
+        "RegistrationYear": 2021,
+        "YearOfStudies": 1,
+        "Semester": 1,
+        "CourseId": "MYY-301",
+        "ProjectGrade": 4,
+        "ExamGrade": 1.5
+    },
+    {
+        "StudentId": "6666",
+        "FirstName": "Name6",
+        "LastName": "LName6",
+        "RegistrationYear": 2018,
+        "YearOfStudies": 1,
+        "Semester": 2,
+        "CourseId": "MYY-301",
+        "ProjectGrade": 6.5,
+        "ExamGrade": 7
+    },
+    {
+        "StudentId": "7777",
+        "FirstName": "Name7",
+        "LastName": "LName1",
+        "RegistrationYear": 2000,
+        "YearOfStudies": 2,
+        "Semester": 4,
+        "CourseId": "MYY-301",
+        "ProjectGrade": 5,
+        "ExamGrade": 5
+    },
+    {
+        "StudentId": "8888",
+        "FirstName": "Name8",
+        "LastName": "LName2",
+        "RegistrationYear": 2002,
+        "YearOfStudies": 4,
+        "Semester": 5,
+        "CourseId": "MYY-301",
+        "ProjectGrade": 5,
+        "ExamGrade": 10
+    },
+    {
+        "StudentId": "9999",
+        "FirstName": "Name9",
+        "LastName": "LName3",
+        "RegistrationYear": 2003,
+        "YearOfStudies": 5,
+        "Semester": 7,
+        "CourseId": "MYY-301",
+        "ProjectGrade": 1,
+        "ExamGrade": 8
+    }
+]
