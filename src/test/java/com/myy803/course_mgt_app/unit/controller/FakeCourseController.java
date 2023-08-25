@@ -1,4 +1,4 @@
-package com.myy803.course_mgt_app.unit;
+package com.myy803.course_mgt_app.unit.controller;
 
 import com.myy803.course_mgt_app.controller.CourseController;
 
