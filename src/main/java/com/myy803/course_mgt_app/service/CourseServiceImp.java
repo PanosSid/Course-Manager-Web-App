@@ -71,15 +71,8 @@ public class CourseServiceImp implements CourseService {
 	
 	@Override
 	public void saveCoursesFromFile(MultipartFile file) throws IOException {
-		System.out.println(getFileExtention(file));
-		courseImporter.setFileLoader(getFileExtention(file));
 		courseDao.saveAll(courseImporter.getCoursesFromFile(file));
 	}
 
-	private String getFileExtention(MultipartFile file) {
-		System.out.println(file.getOriginalFilename());
-		String ending[] = file.getOriginalFilename().split("\\.");
-		return ending[ending.length-1];
-	}
 
 }

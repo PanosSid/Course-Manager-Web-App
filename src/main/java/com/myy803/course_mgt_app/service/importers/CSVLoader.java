@@ -4,7 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -13,29 +15,37 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class CSVLoader implements FileLoader {
 
+	private List<String> headerNames;
+
 	@Override
-	public List<List<String>> getDataFromFile(MultipartFile file) throws IOException{
-		return convertRecordsToDataList(getRecordsFromFile(file));
+	public List<Map<String, String>> getDataFromFile(MultipartFile file) throws IOException {
+		List<CSVRecord> csvRecords = getCSVRecordsFromFile(file);
+		return convertCSVRecordsToDataList(csvRecords);
 	}
-	
-	private List<CSVRecord> getRecordsFromFile(MultipartFile file) throws IOException {
+
+	private List<CSVRecord> getCSVRecordsFromFile(MultipartFile file) throws IOException {
 		BufferedReader fileReader = new BufferedReader(new InputStreamReader(file.getInputStream(), "UTF-8"));
 		CSVParser csvParser = new CSVParser(fileReader,
 				CSVFormat.DEFAULT.withFirstRecordAsHeader().withIgnoreHeaderCase().withTrim());
+		headerNames = csvParser.getHeaderNames();
 		List<CSVRecord> csvRecords = csvParser.getRecords();
 		csvParser.close();
 		return csvRecords;
 	}
-	
-	private List<List<String>> convertRecordsToDataList(List<CSVRecord> csvRecords) {
-		List<List<String>> outerlist = new ArrayList<>();
+
+	private List<Map<String, String>> convertCSVRecordsToDataList(List<CSVRecord> csvRecords) {
+		List<Map<String, String>> dataList = new ArrayList<>();
 		for (CSVRecord csvRecord : csvRecords) {
-			List<String> innerList = new ArrayList<String>();
-			for (int i = 0; i < csvRecord.size(); i++) {
-				innerList.add(csvRecord.get(i));
-			}
-			outerlist.add(innerList);
+			dataList.add(createDataMap(csvRecord));
 		}
-		return outerlist;
+		return dataList;
+	}
+
+	private Map<String, String> createDataMap(CSVRecord csvRecord) {
+		Map<String, String> dataMap = new HashMap<>();
+		for (int i = 0; i < csvRecord.size(); i++) {
+			dataMap.put(headerNames.get(i), csvRecord.get(i));
+		}
+		return dataMap;
 	}
 }
