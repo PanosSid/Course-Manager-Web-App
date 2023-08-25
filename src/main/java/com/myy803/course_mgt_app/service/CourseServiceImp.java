@@ -1,7 +1,6 @@
 package com.myy803.course_mgt_app.service;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +26,9 @@ public class CourseServiceImp implements CourseService {
 	@Autowired
 	private CourseStatisticsService statsService;
 	
+	@Autowired
 	private CourseImporter courseImporter;
-		
-	public CourseServiceImp() {
-		courseImporter = new CourseImporter();
-	}
-	
+			
 	@Override
 	public Course findCourseByCourseId(String theId) {
 		return courseDao.findCourseByCourseId(theId);

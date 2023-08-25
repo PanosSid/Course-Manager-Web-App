@@ -23,33 +23,15 @@ public class ExcelLoaderUnit {
 	private ExcelLoader excelLoader = new ExcelLoader();
 
 	@Test
-	void testGetDataFromFile() throws IOException {
+	void getDataFromFile_EXCEL() throws IOException {
 		String[][] datatypes = { { "CourseId", "Name", "InstructorLogin", "Semester", "Year", "Syllabus" },
 				{ "MYY-301", "Software Development I", "panos", "Spring", "3", "Software development basics" },
 				{ "PLH-010", "Advanced Databases", "panos", "Fall", "4", "Advanced DB and more" } };
 		
 		byte[] bytes = createByteArray(datatypes);
-
 		MockMultipartFile file = new MockMultipartFile("test.xlsx", "test.xlsx", "", bytes);
-
-		List<Map<String, String>> expected = new ArrayList<>();
-		Map<String, String> map1 = new HashMap<String, String>();
-		map1.put("CourseId", "MYY-301");
-		map1.put("Name", "Software Development I");
-		map1.put("InstructorLogin", "panos");
-		map1.put("Semester", "Spring");
-		map1.put("Year", "3");
-		map1.put("Syllabus", "Software development basics");
-		expected.add(map1);
-		Map<String, String> map2 = new HashMap<String, String>();
-		map2.put("CourseId", "PLH-010");
-		map2.put("Name", "Advanced Databases");
-		map2.put("InstructorLogin", "panos");
-		map2.put("Semester", "Fall");
-		map2.put("Year", "4");
-		map2.put("Syllabus", "Advanced DB and more");
-		expected.add(map2);
-
+		List<Map<String, String>> expected = FileLoaderUnitHelper.getExpectedData();
+		
 		Assertions.assertEquals(expected, excelLoader.getDataFromFile(file));
 	}
 

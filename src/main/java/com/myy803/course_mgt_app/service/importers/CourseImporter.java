@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.myy803.course_mgt_app.model.Course;
 
+@Service
 public class CourseImporter {
 	private static final String COURSE_ID = "CourseId";
 	private static final String NAME = "Name";
