@@ -29,7 +29,7 @@ public class CourseImporter {
 	}
 		
 	public List<Course> getCoursesFromFile(MultipartFile file) throws IOException {
-		fileLoader = FileLoaderFactory.createFileLoader(file.getContentType());	
+		fileLoader = FileLoaderFactory.createFileLoader(file.getOriginalFilename());	
 		return convertDataToCoursesList(fileLoader.getDataFromFile(file));
 	}
 	

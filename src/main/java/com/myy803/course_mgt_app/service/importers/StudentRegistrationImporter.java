@@ -24,7 +24,7 @@ public class StudentRegistrationImporter {
 	private FileLoader fileLoader;
 			
 	public List<StudentRegistration> getStudentRegsFromFile(MultipartFile file) throws IOException {
-		fileLoader = FileLoaderFactory.createFileLoader(file.getContentType());	
+		fileLoader = FileLoaderFactory.createFileLoader(file.getOriginalFilename());	
 		return convertDataToStudRegsList(fileLoader.getDataFromFile(file));		
 	}
 	

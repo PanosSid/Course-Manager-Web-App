@@ -23,7 +23,7 @@ public class CourseImporterUnit {
 				+ "MYY-301,Software Development I, panos, Spring,3, Software development basics\r\n"
 				+ "PLH-010,Advanced Databases,panos,Fall,4,Advanced DB and more";
 		
-		MultipartFile mockFile = new MockMultipartFile("testFile.csv", null, "csv", fileContents.getBytes());
+		MultipartFile mockFile = new MockMultipartFile("testFile.csv", "testFile.csv", "csv", fileContents.getBytes());
 				
 		List<Course> expected = new ArrayList<Course>();
 		expected.add(new Course("MYY-301", "panos", "Software Development I", "Spring", 3, "Software development basics"));

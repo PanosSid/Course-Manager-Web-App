@@ -22,7 +22,7 @@ public class StudentRegistrationImporterUnit {
 				+ "330,Name3,LName3, 2017, 3,5,tst-007,2.5,3.5\r\n"
 				+ "440,Name4,LName4, 1995, 5,10,tst-007,8.5,6.5";
 		
-		MultipartFile mockFile = new MockMultipartFile("testFile.csv", null, "text/csv", fileContents.getBytes());
+		MultipartFile mockFile = new MockMultipartFile("testFile.csv", "testFile.csv", "text/csv", fileContents.getBytes());
 				
         List<StudentRegistration> expectedStudRegs = new ArrayList<StudentRegistration>();
         expectedStudRegs.add(new StudentRegistration(330, "Name3", "LName3", 2017, "3", "5", "tst-007", 2.5, 3.5));
