@@ -1,7 +1,6 @@
 package com.myy803.course_mgt_app.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

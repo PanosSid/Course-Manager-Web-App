@@ -29,12 +29,9 @@ public class CourseServiceImp implements CourseService {
 	@Autowired
 	private CourseStatisticsService statsService;
 	
+	@Autowired
 	private CourseImporter courseImporter;
-		
-	public CourseServiceImp() {
-		courseImporter = new CourseImporter();
-	}
-	
+			
 	@Override
 	public Course findCourseByCourseId(String theId) {
 		return courseDao.findCourseByCourseId(theId);
@@ -73,16 +70,9 @@ public class CourseServiceImp implements CourseService {
 	
 	@Override
 	public void saveCoursesFromFile(MultipartFile file) throws IOException {
-		System.out.println(getFileExtention(file));
-		courseImporter.setFileLoader(getFileExtention(file));
 		courseDao.saveAll(courseImporter.getCoursesFromFile(file));
 	}
 
-	private String getFileExtention(MultipartFile file) {
-		System.out.println(file.getOriginalFilename());
-		String ending[] = file.getOriginalFilename().split("\\.");
-		return ending[ending.length-1];
-	}
 
 	@Override
 	public String getCourseGradeDistribution(String courseId, List<GradeType> gradeTypes) {

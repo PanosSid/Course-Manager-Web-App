@@ -83,10 +83,10 @@ public class IntegrationTestStudentRegService {
 	
 	@Test
 	void testSaveStudentRegsFile() throws Exception {
-		Course courseOfStudents = new Course("tst-007", "panos_tester2", "softdev", "1", 3, "Software development basics");
+		Course courseOfStudents = new Course("tst-007", "panos_tester2", "softdev", "Spring", 3, "Software development basics");
 		courseDao.save(courseOfStudents);
 		
-		String fileContents = "AM,First Name,Last Name,Year of Registration,Year of Studies,Semester,Course Id,Project Grade,Exam Grade\r\n"
+		String fileContents = "StudentId,FirstName,LastName,RegistrationYear,YearOfStudies,Semester,CourseId,ProjectGrade,ExamGrade\r\n"
 				+ "330,Name3,LName3, 2017, 3,5,tst-007,2.5,3.5\r\n"
 				+ "440,Name4,LName4, 1995, 5,10,tst-007,8.5,6.5";
 		

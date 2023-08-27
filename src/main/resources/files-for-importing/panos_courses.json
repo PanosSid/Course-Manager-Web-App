@@ -1,0 +1,26 @@
+[
+    {
+        "CourseId": "MYY-301",
+        "Name": "Software Development I",
+        "InstructorLogin": "panos",
+        "Semester": "Fall",
+        "Year": 3,
+        "Syllabus": "Software development basics"
+    },
+    {
+        "CourseId": "PLH-010",
+        "Name": "Advanced Databases",
+        "InstructorLogin": "panos",
+        "Semester": "Spring",
+        "Year": 4,
+        "Syllabus": "Advanced DB and more"
+    },
+    {
+        "CourseId": "PLH-011",
+        "Name": "Advanced Databases II",
+        "InstructorLogin": "panos",
+        "Semester": "Fall",
+        "Year": 5,
+        "Syllabus": "Advanced Databases II and more"
+    }
+]

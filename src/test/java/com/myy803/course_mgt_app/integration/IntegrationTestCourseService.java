@@ -132,7 +132,7 @@ public class IntegrationTestCourseService {
 	
 	@Test 
 	void testSaveCoursesFromFile() throws IOException {
-		String fileContents = "Id,Name,InstructorLogin, Semester,Year,Syllabus\n"
+		String fileContents = "CourseId,Name,InstructorLogin,Semester,Year,Syllabus\n"
 				+ "tst-001,Software Development I, panos_tester, 1,3, Software development basics\n"
 				+ "tst-002,Advanced Databases,panos_tester,2,4,Advanced DB and more\n";
 		

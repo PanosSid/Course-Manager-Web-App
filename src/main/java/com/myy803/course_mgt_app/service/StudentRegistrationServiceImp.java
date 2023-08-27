@@ -19,11 +19,9 @@ public class StudentRegistrationServiceImp implements StudentRegistrationService
 	@Autowired
 	private StudentRegistrationDAO studentRegDao;
 	
-	private StudentRegistrationImporter studRegImporter = new StudentRegistrationImporter();
-
-	public StudentRegistrationServiceImp() {
-	}
-
+	@Autowired
+	private StudentRegistrationImporter studRegImporter;
+	
 	@Override
 	public StudentRegistration findStudentRegistrationByStudentId(int id) {
 		return studentRegDao.findStudentRegistrationByStudentId(id);
@@ -45,17 +43,17 @@ public class StudentRegistrationServiceImp implements StudentRegistrationService
 	}
 
 	@Override
-	public void deleteByStudentId(int theId) {
-		StudentRegistration sr = studentRegDao.findStudentRegistrationByStudentId(theId);
+	public void deleteByStudentId(int id) {
+		StudentRegistration sr = studentRegDao.findStudentRegistrationByStudentId(id);
 		studentRegDao.delete(sr);
 	}
 
 	@Override
 	public void saveStudRegsFromFile(MultipartFile file) throws IOException {
-		studRegImporter.setFileLoader(file.getOriginalFilename().substring(file.getOriginalFilename().indexOf(".")+1));
 		studentRegDao.saveAll(studRegImporter.getStudentRegsFromFile(file));			
 	}
 	
+	@Override
 	public List<Double> findGradesByTypeAndCourse(GradeType gradeType, String courseId) {
 		switch (gradeType) {
         	case Project:

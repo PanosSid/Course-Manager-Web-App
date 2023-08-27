@@ -57,9 +57,11 @@
 			<p th:if="${#fields.hasErrors('yearOfStudies')}" th:errors="*{yearOfStudies}" class="alert alert-danger mb-4 col-4"> </p>
 			<hr>
 			
-			<input type="text" th:field="*{semester}"
-					class="form-control mb-4 col-4" placeholder="Current Semester">
-			<p th:if="${#fields.hasErrors('semester')}" th:errors="*{semester}" class="alert alert-danger mb-4 col-4"> </p>
+			<select id="semester" th:field="*{semester}" class="form-control mb-4 col-4">
+				<option value="" selected hidden>Current Semester</option>
+				<option value="Fall">Fall</option>
+				<option value="Spring">Spring</option>
+			</select>
 			<hr>
 			
 			<input type="text" th:field="*{projectGrade}"
