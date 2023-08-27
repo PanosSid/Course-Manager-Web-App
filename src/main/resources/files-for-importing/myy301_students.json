@@ -5,7 +5,7 @@
         "LastName": "LName3",
         "RegistrationYear": 2017,
         "YearOfStudies": 3,
-        "Semester": 5,
+        "Semester": "Spring",
         "CourseId": "MYY-301",
         "ProjectGrade": 2.5,
         "ExamGrade": 3.5
@@ -16,7 +16,7 @@
         "LastName": "LName4",
         "RegistrationYear": 1995,
         "YearOfStudies": 5,
-        "Semester": 10,
+        "Semester": "Fall",
         "CourseId": "MYY-301",
         "ProjectGrade": 8.5,
         "ExamGrade": 6.5
@@ -27,7 +27,7 @@
         "LastName": "LName5",
         "RegistrationYear": 2021,
         "YearOfStudies": 1,
-        "Semester": 1,
+        "Semester": "Fall",
         "CourseId": "MYY-301",
         "ProjectGrade": 4,
         "ExamGrade": 1.5
@@ -38,7 +38,7 @@
         "LastName": "LName6",
         "RegistrationYear": 2018,
         "YearOfStudies": 1,
-        "Semester": 2,
+        "Semester": "Spring",
         "CourseId": "MYY-301",
         "ProjectGrade": 6.5,
         "ExamGrade": 7
@@ -49,7 +49,7 @@
         "LastName": "LName1",
         "RegistrationYear": 2000,
         "YearOfStudies": 2,
-        "Semester": 4,
+        "Semester": "Fall",
         "CourseId": "MYY-301",
         "ProjectGrade": 5,
         "ExamGrade": 5
@@ -60,7 +60,7 @@
         "LastName": "LName2",
         "RegistrationYear": 2002,
         "YearOfStudies": 4,
-        "Semester": 5,
+        "Semester": "Spring",
         "CourseId": "MYY-301",
         "ProjectGrade": 5,
         "ExamGrade": 10
@@ -71,7 +71,7 @@
         "LastName": "LName3",
         "RegistrationYear": 2003,
         "YearOfStudies": 5,
-        "Semester": 7,
+        "Semester": "Spring",
         "CourseId": "MYY-301",
         "ProjectGrade": 1,
         "ExamGrade": 8
