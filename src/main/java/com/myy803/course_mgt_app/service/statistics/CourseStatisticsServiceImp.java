@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.apache.commons.math3.stat.Frequency;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class CourseStatisticsServiceImp implements CourseStatisticsService {
 		DescriptiveStatistics ds = prepareDataset(grades);
 		for (StatisticStrategy statStrat : statCalculationStrategies) {
 			String stratName = statStrat.getStatisticName();			
-			Double stat = statStrat.calculateStatistic(ds);
+			Double stat = Precision.round(statStrat.calculateStatistic(ds), 3);
 			String statMapKey = createStatMapKey(gradeType, stratName);
 			calculatedStatistics.put(statMapKey, stat);
 		}

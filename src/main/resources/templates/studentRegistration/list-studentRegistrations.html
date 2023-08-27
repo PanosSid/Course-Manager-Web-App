@@ -14,15 +14,14 @@
     <!-- Link to Bootstrap CSS in this case -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
-	<!--  <title>Student Registration Directory</title> -->
 	<title>Student Registration Directory</title>
 </head>
 
 <body>
 
-<div class="container">
+<div class="container mt-4">
 
-	<h3>Student Registrations of <span th:text="${studRegTitle}" ></span></h3>
+	<h3>Student Registrations<!--  of <span th:text="${studRegTitle}" ></span> --></h3>
 	<hr>
 	
 	<table class="table table-bordered table-striped">
@@ -83,15 +82,16 @@
 	<hr>
 	
 	<form method="POST" th:action="@{/studentRegistrations/upload(courseId=${courseId})}" enctype="multipart/form-data">
-    <div class="form-group mt-3" onclick="if (!(confirm('The header line of the file must be: StudentId,FirstName,LastName,RegistrationYear,YearOfStudies,Semester,CourseId,ProjectGrade,ExamGrade'))) return false">
+    <div class="form-group mt-3">
         <label for="file">Select a CSV, Excel or JSON file</label>
         <input type="file" name="file" class="form-control-file" id="file" accept=".csv,.xlsx,.json">
+        <small class="form-text text-muted">The fields of the file must be: StudentId, FirstName, LastName, RegistrationYear, YearOfStudies, Semester, CourseId, ProjectGrade, ExamGrade</small>
     </div>
     <button type="submit"  class="btn btn-outline-secondary">Import Student Regs</button>
 	</form>
 	
 	<hr>
-	<a th:href="@{/courses/list}">Back to Course Directory </a>
+	<a th:href="@{/courses/list}" class="btn btn-secondary">Back to Course Directory</a>
 	
 	<br>
 	<hr>

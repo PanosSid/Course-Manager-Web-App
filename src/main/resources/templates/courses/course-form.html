@@ -2,73 +2,82 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-
-	<title>Save Course</title>
+    <title>Save Course</title>
 </head>
 
 <body>
-	
-	<div class="container">
-	
-		<h3>Course Directory</h3>
-		<hr>
-		
-		<p class="h4 mb-4">Save Course of instructor: <span th:text="${instructorLogin}" ></span> </p>
-		
-		<!-- <h3><span th:text="${instructorLogin}" ></span></h3> -->
-		
-		<form action="#" th:action="@{/courses/save}"
-						 th:object="${course}" method="POST">
-		
-			<!-- Add hidden form field to handle update -->
-			<!-- <input type="hidden" th:value="${instructorLogin}" th:field="*{instructorLogin}"> -->
-			<input type="hidden" th:field="*{dbKey}" />
-			
-			<input type="text" th:field="*{courseId}"	class="form-control mb-4 col-4" placeholder="Course Id">
-			<p th:if="${#fields.hasErrors('courseId')}" th:errors="*{courseId}" class="alert alert-danger mb-4 col-4"><hr> </p>
-			
-			<input type="text" th:field="*{name}" class="form-control mb-4 col-4 " placeholder="Name">
-			<p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="alert alert-danger mb-4 col-4"> <hr> </p>
-			
-			<input type="hidden" id="instructorLogin" name="instructorLogin" th:value="${instructorLogin}" />
 
-			<input type="number" th:field="*{year}"
-					class="form-control mb-4 col-4" placeholder="Year">
-					<p th:if="${#fields.hasErrors('year')}" th:errors="*{year}" class="alert alert-danger mb-4 col-4"> <hr></p>
-			
-			<select id="semester" th:field="*{semester}" class="form-control mb-4 col-4">
-				<option value="" selected hidden>Current Semester</option>
-				<option value="Fall">Fall</option>
-				<option value="Spring">Spring</option>
-			</select>
-			<hr>
-					
-			<input type="text" th:field="*{syllabus}"
-					class="form-control mb-4 col-4" placeholder="Syllabus">
-					<p th:if="${#fields.hasErrors('syllabus')}" th:errors="*{syllabus}" class="alert alert-danger mb-4 col-4"> <hr></p>
-							
-						
-			<button type="submit" class="btn btn-info col-2">Save</button>
-			
-					
-		</form>
-		
-	
-		<hr>
-		<a th:href="@{/courses/list}">Back to Courses List</a>
+<div class="container my-5">
+    <h2 class="mb-4">Course Form</h2>
+    <hr>
+    
+    <h4 class="mb-4">Save Course of instructor: <span th:text="${instructorLogin}" ></span></h4>
+    
+    <form action="#" th:action="@{/courses/save}" th:object="${course}" method="POST">
 
-	</div>
+        <input type="hidden" th:field="*{dbKey}" />
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Course Id</label>
+            <div class="col-sm-4">
+                <input type="text" th:field="*{courseId}" class="form-control" placeholder="Course Id">
+                <p th:if="${#fields.hasErrors('courseId')}" th:errors="*{courseId}" class="alert alert-danger mt-2"></p>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Name</label>
+            <div class="col-sm-4">
+                <input type="text" th:field="*{name}" class="form-control" placeholder="Name">
+                <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="alert alert-danger mt-2"></p>
+            </div>
+        </div>
+
+        <input type="hidden" id="instructorLogin" name="instructorLogin" th:value="${instructorLogin}" />
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Year</label>
+            <div class="col-sm-4">
+                <input type="number" th:field="*{year}" class="form-control" placeholder="Year">
+                <p th:if="${#fields.hasErrors('year')}" th:errors="*{year}" class="alert alert-danger mt-2"></p>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Semester</label>
+            <div class="col-sm-4">
+                <select id="semester" th:field="*{semester}" class="form-control">
+                    <option value="" selected hidden>Current Semester</option>
+                    <option value="Fall">Fall</option>
+                    <option value="Spring">Spring</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Syllabus</label>
+            <div class="col-sm-4">
+                <input type="text" th:field="*{syllabus}" class="form-control" placeholder="Syllabus">
+                <p th:if="${#fields.hasErrors('syllabus')}" th:errors="*{syllabus}" class="alert alert-danger mt-2"></p>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <div class="col-sm-4 offset-sm-2">
+                <button type="submit" class="btn btn-info">Save</button>
+            </div>
+        </div>
+        
+    </form>
+
+    <hr>
+    <a th:href="@{/courses/list}" class="btn btn-secondary">Back to Course Directory</a>
+
+</div>
+
 </body>
 
 </html>
-
-
-
-
-
