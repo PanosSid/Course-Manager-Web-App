@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.myy803.course_mgt_app.model.Course;
 import com.myy803.course_mgt_app.service.CourseService;
+import com.myy803.course_mgt_app.service.GradeType;
 
 @Controller
 @RequestMapping("/courses")
@@ -110,4 +111,18 @@ public class CourseController {
 		courseService.saveCoursesFromFile(file);
 		return "redirect:/courses/list";
 	}
+	
+	@PostMapping("/distribution")
+	public String showGradesDistribution(@RequestParam("courseId") String courseId,  Model model,
+			@RequestParam(value = "selectedCategories", required = false, defaultValue = "") List<String> selectedCategories) {
+		if (selectedCategories.isEmpty()) {
+	        model.addAttribute("errorMessage", "Please select at least one grade category.");
+	        return "/courses/course-statistics";
+		}
+		List<GradeType> selectedGradeTypes = GradeType.createFromStrings(selectedCategories);
+		String distrJsonStr = courseService.getCourseGradeDistribution(courseId, selectedGradeTypes);
+		model.addAttribute("jsonData", distrJsonStr);
+		return "/courses/distribution";
+	}
+	
 }

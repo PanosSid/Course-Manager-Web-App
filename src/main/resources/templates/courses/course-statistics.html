@@ -1,117 +1,147 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <!-- Required meta tags -->
 
-<head>
-    <!-- Required meta tags -->
-    
-    <!-- Set the Character set for the page -->
-    <meta charset="utf-8">
-    
-    <!-- Let the page adapt to client device -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <!-- Set the Character set for the page -->
+        <meta charset="utf-8" />
 
-	<!-- Link to external resource (css, search, etc.) -->
-    <!-- Link to Bootstrap CSS in this case -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+        <!-- Let the page adapt to client device -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 
-	<title>Statistics Page</title>
-</head>
+        <!-- Link to external resource (css, search, etc.) -->
+        <!-- Link to Bootstrap CSS in this case -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
 
-<body>
+        <title>Statistics Page</title>
+    </head>
 
-<div class="container">
+    <body>
+        <div class="container">
+            <h2>Statistics of <span th:text="${studRegTitle}"></span></h2>
+            <hr />
 
-	<h2>Statistics of <span th:text="${studRegTitle}" ></span></h2>
-	<hr>
-	
-	<h4>Project Grade Stats</h4>
-	<table class="table table-bordered table-striped">
-		<thead class="thead-light">
-			<tr>
-				<th>Min</th>
-				<th>Max</th>
-				<th>Mean</th>
-				<th>Standard Deviation</th>
-				<th>Variance</th>
-				<th>Skewness</th>
-				<th>Median (50th-Percentile)</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			<td th:text="${ProjectMin}" />
-			<td th:text="${ProjectMax}" />
-			<td th:text="${ProjectMean}" />
-			<td th:text="${ProjectStandardDeviation}" />	
-			<td th:text="${ProjectVariance}" />		
-			<td th:text="${ProjectSkewness}" />
-			<td th:text="${ProjectPercentile}" />
-		</tbody>		
-	</table>
-	
-	<hr>
-	
-	<h4>Exam Grade Stats</h4>
-	<table class="table table-bordered table-striped ">
-		<thead class="thead-light">
-			<tr>
-				<th>Min</th>
-				<th>Max</th>
-				<th>Mean</th>
-				<th>Standard Deviation</th>
-				<th>Variance</th>
-				<th>Skewness</th>
-				<th>Median (50th-Percentile)</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			<td th:text="${ExamMin}" />
-			<td th:text="${ExamMax}" />
-			<td th:text="${ExamMean}" />
-			<td th:text="${ExamStandardDeviation}" />	
-			<td th:text="${ExamVariance}" />		
-			<td th:text="${ExamSkewness}" />
-			<td th:text="${ExamPercentile}" />
-		</tbody>		
-	</table>
-	
-	<hr>
-	
-	<h4>Final Grade Stats</h4>
-	<table class="table table-bordered table-striped table-dark">
-		<thead class="thead-dark">
-			<tr>
-				<th>Min</th>
-				<th>Max</th>
-				<th>Mean</th>
-				<th>Standard Deviation</th>
-				<th>Variance</th>
-				<th>Skewness</th>
-				<th>Median (50th-Percentile)</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			<td th:text="${FinalMin}" />
-			<td th:text="${FinalMax}" />
-			<td th:text="${FinalMean}" />
-			<td th:text="${FinalStandardDeviation}" />	
-			<td th:text="${FinalVariance}" />		
-			<td th:text="${FinalSkewness}" />
-			<td th:text="${FinalPercentile}" />
-		</tbody>		
-	</table>
-	
-	<hr>
-	<a th:href="@{/courses/list}">Back to Course Directory </a>
-	
-	
-	
-</div>
-	
-</body>
+            <h4>Project Grade Stats</h4>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Min</th>
+                        <th>Max</th>
+                        <th>Mean</th>
+                        <th>Standard Deviation</th>
+                        <th>Variance</th>
+                        <th>Skewness</th>
+                        <th>Median (50th-Percentile)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <td th:text="${ProjectMin}" />
+                    <td th:text="${ProjectMax}" />
+                    <td th:text="${ProjectMean}" />
+                    <td th:text="${ProjectStandardDeviation}" />
+                    <td th:text="${ProjectVariance}" />
+                    <td th:text="${ProjectSkewness}" />
+                    <td th:text="${ProjectPercentile}" />
+                </tbody>
+            </table>
+
+            <hr />
+
+            <h4>Exam Grade Stats</h4>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Min</th>
+                        <th>Max</th>
+                        <th>Mean</th>
+                        <th>Standard Deviation</th>
+                        <th>Variance</th>
+                        <th>Skewness</th>
+                        <th>Median (50th-Percentile)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <td th:text="${ExamMin}" />
+                    <td th:text="${ExamMax}" />
+                    <td th:text="${ExamMean}" />
+                    <td th:text="${ExamStandardDeviation}" />
+                    <td th:text="${ExamVariance}" />
+                    <td th:text="${ExamSkewness}" />
+                    <td th:text="${ExamPercentile}" />
+                </tbody>
+            </table>
+
+            <hr />
+
+            <h4>Final Grade Stats</h4>
+            <table class="table table-bordered table-striped table-dark">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Min</th>
+                        <th>Max</th>
+                        <th>Mean</th>
+                        <th>Standard Deviation</th>
+                        <th>Variance</th>
+                        <th>Skewness</th>
+                        <th>Median (50th-Percentile)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <td th:text="${FinalMin}" />
+                    <td th:text="${FinalMax}" />
+                    <td th:text="${FinalMean}" />
+                    <td th:text="${FinalStandardDeviation}" />
+                    <td th:text="${FinalVariance}" />
+                    <td th:text="${FinalSkewness}" />
+                    <td th:text="${FinalPercentile}" />
+                </tbody>
+            </table>
+
+            <hr />
+
+            <div class="container mt-4">
+                <h4>
+                    View grade distribution for:
+                </h4>
+                <form th:action="@{/courses/distribution}" method="post" class="form-inline">
+                    <input type="hidden" name="courseId" th:value="${courseId}" />
+                    <div class="form-group">
+                        <div class="form-check mr-2"><input class="form-check-input" type="checkbox" th:name="selectedCategories" th:value="Project" /> <label class="form-check-label">Project</label></div>
+                        <div class="form-check mr-2"><input class="form-check-input" type="checkbox" th:name="selectedCategories" th:value="Exam" /> <label class="form-check-label">Exam</label></div>
+                        <div class="form-check"><input class="form-check-input" type="checkbox" th:name="selectedCategories" th:value="Final" /> <label class="form-check-label">Final</label></div>
+                    </div>
+                    <div class="col-md-6">
+                		<button class="btn btn-primary mt-3 float-md-down" type="submit">Submit</button>
+           			</div>
+                </form>
+
+                <div th:if="${errorMessage}" class="alert alert-danger mt-3">
+                    <p th:text="${errorMessage}"></p>
+                </div>
+            </div>
+
+            <hr />
+            <a th:href="@{/courses/list}">Back to Course Directory </a>
+        </div>
+        <script>
+            function updateSubmitButton() {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                const submitButton = document.querySelector('button[type="submit"]');
+                let anyCheckboxChecked = Array.from(checkboxes).some((checkbox) => checkbox.checked);
+
+                submitButton.disabled = !anyCheckboxChecked;
+            }
+
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach((checkbox) => {
+                checkbox.addEventListener("change", updateSubmitButton);
+            });
+
+            // Initial call to update the submit button state
+            updateSubmitButton();
+        </script>
+    </body>
 </html>
-
-
-
